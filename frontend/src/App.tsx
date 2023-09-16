@@ -1,4 +1,3 @@
-import * as React from "react";
 import { useEffect, useState } from "react";
 import {
   ChakraProvider,
@@ -13,6 +12,7 @@ import {
 import { ColorModeSwitcher } from "./ColorModeSwitcher";
 import { Logo } from "./Logo";
 import axios from "axios";
+import Home from "./pages/Home";
 
 export const App = () => {
   const [message, setMessage] = useState("");
@@ -24,7 +24,7 @@ export const App = () => {
         setMessage(response.data.message);
       })
       .catch((error) => {
-        setMessage("Error");
+        setMessage("Error... Make sure the backend is running!");
         console.error("There was an error fetching data", error);
       });
   }, []);
@@ -35,6 +35,7 @@ export const App = () => {
           <ColorModeSwitcher justifySelf="flex-end" />
           <VStack spacing={8}>
             <Logo h="40vmin" pointerEvents="none" />
+            <Home />
             <Text>
               Edit <Code fontSize="xl">src/App.tsx</Code> and save to reload.
             </Text>
@@ -42,7 +43,7 @@ export const App = () => {
             <Link
               color="teal.500"
               href="https://chakra-ui.com"
-              fontSize="2xl"
+              fontSize="xl"
               target="_blank"
               rel="noopener noreferrer"
             >
