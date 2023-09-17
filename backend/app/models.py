@@ -7,6 +7,8 @@ class User(models.Model):
     username = models.CharField(max_length=50)
     email = models.EmailField(max_length=100)
     password = models.CharField(max_length=128)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def set_password(self, raw_password):
         self.password = make_password(raw_password)
@@ -32,3 +34,6 @@ class Flashcard(models.Model):
 class DeckFlashcard(models.Model):
     deck = models.ForeignKey(Deck, on_delete=models.CASCADE)
     flashcard = models.ForeignKey(Flashcard, on_delete=models.CASCADE)
+    position = models.IntegerField()
+    class Meta:
+        unique_together = ('deck', 'position')
