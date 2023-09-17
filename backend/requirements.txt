@@ -1,0 +1,6 @@
+# Core Django package
+Django==4.2.5
+# Handle CORS issues
+django-cors-headers==4.2.0
+# Toolkit for building Web APIs
+djangorestframework==3.14.0
