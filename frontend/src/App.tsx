@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ColorModeSwitcher } from "./ColorModeSwitcher";
 import Home from "./pages/Home";
 import Nav from "./components/Navbar";
+import SignupCard from "./pages/SignUp";
 
 export const App = () => {
   return (
@@ -12,6 +13,7 @@ export const App = () => {
           <Nav />
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/signup" element={<SignupCard />} />
             <Route path="*" element={"404"} />
           </Routes>
         </Box>
