@@ -6,6 +6,8 @@ import {
   Avatar,
   Text,
   Button,
+  Image,
+  Link,
   Menu,
   MenuButton,
   MenuList,
@@ -21,11 +23,11 @@ import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 
 interface Props {
   children: React.ReactNode;
-  link:string
+  link: string;
 }
 
 const NavLink = (props: Props) => {
-  const { children,link } = props;
+  const { children, link } = props;
 
   return (
     <Box
@@ -51,7 +53,11 @@ export default function Nav() {
     <>
       <Box px={4}>
         <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
-          <Box>Logo</Box>
+          <Box>
+            <Link href="/">
+              <Image src="logo256.png" boxSize="48px" objectFit="cover" />
+            </Link>
+          </Box>
 
           <Flex alignItems={"center"}>
             <Stack direction={"row"} spacing={7}>
@@ -87,7 +93,9 @@ export default function Nav() {
                   <br />
                   <MenuDivider />
                   <MenuItem>Your Servers</MenuItem>
-                  <NavLink link = "/account"><MenuItem>Account Settings</MenuItem></NavLink>
+                  <NavLink link="/account">
+                    <MenuItem>Account Settings</MenuItem>
+                  </NavLink>
                   <MenuItem>Logout</MenuItem>
                 </MenuList>
               </Menu>
