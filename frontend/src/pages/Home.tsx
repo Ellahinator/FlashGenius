@@ -10,6 +10,7 @@ import {
   Icon,
   IconProps,
 } from "@chakra-ui/react";
+import {Link} from 'react-router-dom';
 
 const Illustration = (props: IconProps) => {
   return (
@@ -859,6 +860,7 @@ export default function CallToActionWithIllustration() {
           Experience the future of efficient learning today.
         </Text>
         <Stack spacing={6} direction={"row"}>
+          <Link to="/signup">
           <Button
             rounded={"full"}
             px={6}
@@ -868,6 +870,7 @@ export default function CallToActionWithIllustration() {
           >
             Get started
           </Button>
+          </Link>
           <Button rounded={"full"} px={6}>
             Learn more
           </Button>
