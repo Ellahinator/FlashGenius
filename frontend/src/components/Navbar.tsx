@@ -21,10 +21,11 @@ import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 
 interface Props {
   children: React.ReactNode;
+  link:string
 }
 
 const NavLink = (props: Props) => {
-  const { children } = props;
+  const { children,link } = props;
 
   return (
     <Box
@@ -36,7 +37,7 @@ const NavLink = (props: Props) => {
         textDecoration: "none",
         bg: useColorModeValue("gray.200", "gray.700"),
       }}
-      href={"#"}
+      href={link}
     >
       {children}
     </Box>
@@ -86,7 +87,7 @@ export default function Nav() {
                   <br />
                   <MenuDivider />
                   <MenuItem>Your Servers</MenuItem>
-                  <MenuItem>Account Settings</MenuItem>
+                  <NavLink link = "/account"><MenuItem>Account Settings</MenuItem></NavLink>
                   <MenuItem>Logout</MenuItem>
                 </MenuList>
               </Menu>
