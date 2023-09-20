@@ -1,5 +1,7 @@
 'use client'
 
+import {Link as ReactRouterLink} from 'react-router-dom';
+import {Link as ChakraLink} from '@chakra-ui/react';
 import {
   Flex,
   Box,
@@ -18,6 +20,7 @@ import {
 } from '@chakra-ui/react'
 import { useState } from 'react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
+
 
 export default function SignupCard() {
   const [showPassword, setShowPassword] = useState(false)
@@ -78,7 +81,7 @@ export default function SignupCard() {
               <Button
                 loadingText="Submitting"
                 size="lg"
-                bg={'blue.400'}
+                bg={'orange.400'}
                 color={'white'}
                 _hover={{
                   bg: 'blue.500',
@@ -88,7 +91,8 @@ export default function SignupCard() {
             </Stack>
             <Stack pt={6}>
               <Text align={'center'}>
-                Already a user? <Link color={'blue.400'}>Login</Link>
+                Already a user? 
+                <ChakraLink as={ReactRouterLink} to='/login' color={'orange.400'}>Login</ChakraLink>
               </Text>
             </Stack>
           </Stack>

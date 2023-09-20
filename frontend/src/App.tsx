@@ -4,6 +4,7 @@ import { ColorModeSwitcher } from "./ColorModeSwitcher";
 import Home from "./pages/Home";
 import Nav from "./components/Navbar";
 import SignupCard from "./pages/SignUp";
+import LoginCard from "./pages/Login";
 
 export const App = () => {
   return (
@@ -14,6 +15,7 @@ export const App = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/signup" element={<SignupCard />} />
+            <Route path="/login" element={<LoginCard />} />
             <Route path="*" element={"404"} />
           </Routes>
         </Box>
