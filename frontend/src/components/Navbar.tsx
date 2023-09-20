@@ -6,6 +6,7 @@ import {
   Avatar,
   Text,
   Button,
+  Link,
   Menu,
   MenuButton,
   MenuList,
@@ -18,31 +19,6 @@ import {
   Center,
 } from "@chakra-ui/react";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
-
-interface Props {
-  children: React.ReactNode;
-  link:string
-}
-
-const NavLink = (props: Props) => {
-  const { children,link } = props;
-
-  return (
-    <Box
-      as="a"
-      px={2}
-      py={1}
-      rounded={"md"}
-      _hover={{
-        textDecoration: "none",
-        bg: useColorModeValue("gray.200", "gray.700"),
-      }}
-      href={link}
-    >
-      {children}
-    </Box>
-  );
-};
 
 export default function Nav() {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -87,7 +63,9 @@ export default function Nav() {
                   <br />
                   <MenuDivider />
                   <MenuItem>Your Servers</MenuItem>
-                  <NavLink link = "/account"><MenuItem>Account Settings</MenuItem></NavLink>
+                  <Link href="/account">
+                    <MenuItem>Account Settings</MenuItem>
+                  </Link>
                   <MenuItem>Logout</MenuItem>
                 </MenuList>
               </Menu>
