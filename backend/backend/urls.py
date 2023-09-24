@@ -20,5 +20,9 @@ from app import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", views.index, name="index"),
+    path("", views.index, name="home"),
+    path("signup/", views.signup_view, name="signup"),
+    path("login/", views.login_view, name="login"),
+    path("logout/", views.logout_view, name="logout"),
+    path("csrf_cookie", views.get_csrf_token, name="csrf"),
 ]
