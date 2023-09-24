@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -53,9 +54,15 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",  # corsheaders
 ]
 
+CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # React app
+    "http://localhost:3000", "http://127.0.0.1:3000"  # React app
 ]
+CSRF_TRUSTED_ORIGINS = ['http://localhost:3000', 'http://127.0.0.1:3000']
+
+SESSION_COOKIE_SAMESITE = None
+CSRF_COOKIE_HTTPONLY = False
+CSRF_COOKIE_SECURE = True
 
 REST_FRAMEWORK = {'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.AllowAny']}
 
@@ -64,7 +71,10 @@ ROOT_URLCONF = "backend.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [
+            os.path.join(BASE_DIR, 'templates'),
+            os.path.join(BASE_DIR, 'backend/templates'),            
+        ],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
