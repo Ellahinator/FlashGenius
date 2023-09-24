@@ -10,7 +10,7 @@ import {
   Icon,
   IconProps,
 } from "@chakra-ui/react";
-import {Link} from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 const Illustration = (props: IconProps) => {
   return (
@@ -861,15 +861,15 @@ export default function CallToActionWithIllustration() {
         </Text>
         <Stack spacing={6} direction={"row"}>
           <Link to="/signup">
-          <Button
-            rounded={"full"}
-            px={6}
-            colorScheme={"orange"}
-            bg={"orange.400"}
-            _hover={{ bg: "orange.500" }}
-          >
-            Get started
-          </Button>
+            <Button
+              rounded={"full"}
+              px={6}
+              colorScheme={"orange"}
+              bg={"orange.400"}
+              _hover={{ bg: "orange.500" }}
+            >
+              Get started
+            </Button>
           </Link>
           <Button rounded={"full"} px={6}>
             Learn more
