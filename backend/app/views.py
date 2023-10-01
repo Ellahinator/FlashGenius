@@ -1,14 +1,13 @@
 import json
-from django.shortcuts import render
+from django.shortcuts import render,get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
-from .forms import UserCreationForm
-from .forms import FlashcardForm
-from .models import Deck
+from .forms import UserCreationForm,FlashcardForm
+from .models import Deck,Flashcard
 # Create your views here.
 
 # Creating Flash Card
@@ -71,3 +70,15 @@ def logout_view(request):
 @ensure_csrf_cookie
 def get_csrf_token(request):
     return JsonResponse({'status': "success", "message": "CSRF cookie set"})
+
+
+# Deleting Flash Card
+def delete_flashcard(request, flashcard_id):
+    flashcard = get_object_or_404(Flashcard, pk=flashcard_id)
+
+    # Check if the user has permission to delete the flashcard
+    if request.user == flashcard.user:
+        flashcard.delete()
+        return redirect('flashcard_list')  # Redirect to Flashcards page (Needs to be created)
+    else:
+        return render(request, 'flashcard_delete_error.html')  # Show an error page if the user doesn't have permission

@@ -25,4 +25,8 @@ urlpatterns = [
     path("login/", views.login_view, name="login"),
     path("logout/", views.logout_view, name="logout"),
     path("csrf_cookie", views.get_csrf_token, name="csrf"),
+    # URL pattern for creating a Flashcard
+    path('flashcards/create/', views.create_flashcard, name='create_flashcard'),
+    # URL pattern for deleting a Flashcard
+    path('flashcards/<int:flashcard_id>/delete/', views.delete_flashcard, name='delete_flashcard'),
 ]
