@@ -6,10 +6,27 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
-from .forms import UserCreationForm
-from .models import Flashcard
-
+from .forms import UserCreationForm,FlashcardForm
+from .models import Deck,Flashcard
 # Create your views here.
+
+# Creating Flash Card
+def create_flashcard(request):
+    if request.method == 'POST':
+        form = FlashcardForm(request.POST)
+        if form.is_valid:
+            flashcard = form.save(commit=False)
+            flashcard.user = request.user   # Authenticated User
+            deck_id = request.POST.get('deck_id') # Getting deck associated with flashcard
+            deck = Deck.object.get(pk=deck_id)     
+            flashcard.deck = deck
+            flashcard.save()
+            return redirect('flashcard_list')   # Redirect to Flashcards page (Needs to be created)
+    else:
+        form = FlashcardForm()
+    return render(request,'flashcard_create.html',{
+        'form':form
+    })
 
 def index(request):
     return JsonResponse({'message': 'Hello, world!'})
