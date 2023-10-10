@@ -8,7 +8,13 @@ export default function FlashcardGen() {
     { term: string; definition: string }[]
   >([]);
   const [currentFlashcardIndex, setCurrentFlashcardIndex] = useState(0);
+  const [showBack, setShowBack] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const toggleCard = () => {
+    setShowBack(!showBack);
+  };
+
   // Mock data
   const inputData =
     "An array is a number of elements in a specific order, typically all of the same type (depending on the language, individual elements may either all be forced to be the same type, or may be of almost any type). Elements are accessed using an integer index to specify which element is required. Typical implementations allocate contiguous memory words for the elements of arrays (but this is not always a necessity). Arrays may be fixed-length or resizable. A linked list (also just called list) is a linear collection of data elements of any type, called nodes, where each node has itself a value, and points to the next node in the linked list. The principal advantage of a linked list over an array is that values can always be efficiently inserted and removed without relocating the rest of the list. Certain other operations, such as random access to a certain element, are however slower on lists than on arrays. A record (also called tuple or struct) is an aggregate data structure. A record is a value that contains other values, typically in fixed number and sequence and typically indexed by names. The elements of records are usually called fields or members. In the context of object-oriented programming, records are known as plain old data structures to distinguish them from objects.[11] Hash tables, also known as hash maps, are data structures that provide fast retrieval of values based on keys. They use a hashing function to map keys to indexes in an array, allowing for constant-time access in the average case. Hash tables are commonly used in dictionaries, caches, and database indexing. However, hash collisions can occur, which can impact their performance. Techniques like chaining and open addressing are employed to handle collisions.";
@@ -50,12 +56,14 @@ export default function FlashcardGen() {
     setCurrentFlashcardIndex(
       (prevIndex) => (prevIndex + 1) % flashcards.length
     );
+    setShowBack(false);
   };
 
   const prevFlashcard = () => {
     setCurrentFlashcardIndex(
       (prevIndex) => (prevIndex - 1 + flashcards.length) % flashcards.length
     );
+    setShowBack(false);
   };
   return (
     <Flex flexDirection={"column"} alignItems={"center"} minHeight={"100vh"}>
@@ -70,9 +78,10 @@ export default function FlashcardGen() {
           disabled
           size={"lg"}
           minHeight={"300px"}
+          width={"800px"}
           maxWidth={"800px"}
         />
-        <Flex flexDirection="column" alignItems="center">
+        <Flex flexDirection="column" alignItems="center" mt={"2"}>
           <Button
             onClick={generateFlashcards}
             isLoading={loading}
@@ -94,6 +103,8 @@ export default function FlashcardGen() {
               <Flashcard
                 front={flashcards[currentFlashcardIndex].term}
                 back={flashcards[currentFlashcardIndex].definition}
+                showBack={showBack}
+                toggleCard={toggleCard}
               />
               <Flex marginTop={4}>
                 <Button

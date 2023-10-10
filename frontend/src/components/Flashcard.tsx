@@ -4,14 +4,11 @@ import { Card, Text, useColorModeValue } from "@chakra-ui/react";
 interface FlashcardProps {
   front: string;
   back: string;
+  showBack: boolean;
+  toggleCard: () => void;
 }
 
-const Flashcard = ({ front, back }: FlashcardProps) => {
-  const [showBack, setShowBack] = useState(false);
-
-  const toggleCard = () => {
-    setShowBack(!showBack);
-  };
+const Flashcard = ({ front, back, showBack, toggleCard }: FlashcardProps) => {
   const bgColor = useColorModeValue("white", "gray.800");
   const textColor = useColorModeValue("gray.700", "white");
   const borderColor = useColorModeValue("gray.200", "gray.700");
