@@ -101,14 +101,14 @@ export default function LoginCard() {
           <Stack spacing={4}>
             <FormControl id="username" isRequired >
               <FormLabel>Username</FormLabel>
-              <Input type="email" onChange={handleChange}/>
+              <Input type="text" name="username" onChange={handleChange} />
             </FormControl>
             <FormControl id="password" isRequired>
               <FormLabel>Password</FormLabel>
               <InputGroup>
                 <Input
                   type={showPassword ? "text" : "password"}
-                  name="password1"
+                  name="password"
                   onChange={handleChange}
                 />
                 <InputRightElement>
@@ -142,7 +142,7 @@ export default function LoginCard() {
                 }}
                 onClick={handleSubmit}
               >
-                Sign in
+                Login
               </Button>
             </Stack>
           </Stack>
