@@ -58,14 +58,11 @@ export default function FlashcardGen() {
     );
   };
   return (
-    <Flex
-      flexDirection={"column"}
-      alignItems={"center"}
-      justifyContent={"center"}
-      minHeight={"100vh"}
-    >
-      <Text fontSize="3xl">Flashcard Generator</Text>
-      <Grid>
+    <Flex flexDirection={"column"} alignItems={"center"} minHeight={"100vh"}>
+      <Text fontSize="4xl" fontWeight="bold">
+        Flashcard Generator
+      </Text>
+      <Grid marginTop={"7"}>
         <Textarea
           placeholder=""
           value={inputData}
@@ -79,7 +76,10 @@ export default function FlashcardGen() {
           <Button
             onClick={generateFlashcards}
             isLoading={loading}
+            loadingText="Generating Flashcards..."
             marginTop={"4"}
+            colorScheme="orange"
+            bg={"orange.400"}
           >
             Generate Flashcards
           </Button>
