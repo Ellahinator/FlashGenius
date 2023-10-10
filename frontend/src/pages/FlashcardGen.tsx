@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Textarea, Button, Flex, Grid, Text, Spinner } from "@chakra-ui/react";
+import { Textarea, Button, Flex, Grid, Text } from "@chakra-ui/react";
 import Flashcard from "../components/Flashcard";
 
 export default function FlashcardGen() {
@@ -83,8 +83,18 @@ export default function FlashcardGen() {
           >
             Generate Flashcards
           </Button>
-          {flashcards.length > 0 && (
+        </Flex>
+        <Flex
+          flexDirection={"column"}
+          alignItems={"center"}
+          justifyContent={"center"}
+        >
+          {flashcards.length > 0 && !loading && (
             <>
+              <Flashcard
+                front={flashcards[currentFlashcardIndex].term}
+                back={flashcards[currentFlashcardIndex].definition}
+              />
               <Flex marginTop={4}>
                 <Button
                   onClick={prevFlashcard}
@@ -99,21 +109,10 @@ export default function FlashcardGen() {
                   Next
                 </Button>
               </Flex>
-              <Text marginTop={4}>
+              <Text marginTop={4} fontSize="sm">
                 {currentFlashcardIndex + 1}/{flashcards.length}
               </Text>
             </>
-          )}
-        </Flex>
-        <Flex
-          flexDirection="column"
-          alignItems={{ base: "center", lg: "flex-start" }}
-        >
-          {flashcards.length > 0 && (
-            <Flashcard
-              front={flashcards[currentFlashcardIndex].term}
-              back={flashcards[currentFlashcardIndex].definition}
-            />
           )}
         </Flex>
       </Grid>
