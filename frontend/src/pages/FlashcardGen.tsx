@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Textarea, Button, Flex, Grid, Text } from "@chakra-ui/react";
+import { Textarea, Button, Flex, Grid, Text, Skeleton } from "@chakra-ui/react";
 import Flashcard from "../components/Flashcard";
 
 export default function FlashcardGen() {
@@ -98,6 +98,7 @@ export default function FlashcardGen() {
           alignItems={"center"}
           justifyContent={"center"}
         >
+          {loading && <Skeleton height="300px" width="500px" my={4} />}
           {flashcards.length > 0 && !loading && (
             <>
               <Flashcard
@@ -124,6 +125,11 @@ export default function FlashcardGen() {
                 {currentFlashcardIndex + 1}/{flashcards.length}
               </Text>
             </>
+          )}
+          {flashcards.length === 0 && !loading && (
+            <Text marginTop={4} fontSize="sm">
+              No flashcards generated yet. Click "Generate Flashcards" to start.
+            </Text>
           )}
         </Flex>
       </Grid>
