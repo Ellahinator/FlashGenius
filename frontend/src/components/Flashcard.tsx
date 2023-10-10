@@ -14,24 +14,12 @@ const Flashcard = ({ front, back }: FlashcardProps) => {
   };
     return (
         <Card
-          p={4}
-          borderWidth="1px"
-          borderRadius="md"
-          boxShadow="md"
-          bg="white"
-          onClick={toggleCard} 
+          p={4} borderWidth="1px" borderRadius="md" boxShadow="md" bg="white" onClick={toggleCard} 
         _hover={{
             boxShadow: "lg",
             transform: "scale(1.02)",
             cursor: "pointer", 
-        }}
-        // maxWidth="400px"
-        width="500px"
-        height="300px"
-        margin="5px"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
+        }} width="500px" height="300px" margin="20px" display="flex" alignItems="center" justifyContent="center"
         >
     <Text fontSize="30px" fontWeight="bold" color={"black"} display={showBack ? "none" : "block"} >
              {front}

@@ -7,7 +7,6 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from .forms import UserCreationForm
-
 # Create your views here.
 
 def index(request):
