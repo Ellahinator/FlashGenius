@@ -6,8 +6,7 @@ import Account from "./pages/Account";
 import Nav from "./components/Navbar";
 import SignupCard from "./pages/SignUp";
 import LoginCard from "./pages/Login";
-import Flashcard from "./components/Flashcard";
-import FlashcardGen from "./pages/FlashcardGen";
+import MockGenerator from "./pages/MockGenerator";
 
 export const App = () => {
   return (
@@ -20,7 +19,7 @@ export const App = () => {
             <Route path="/signup" element={<SignupCard />} />
             <Route path="/login" element={<LoginCard />} />
             <Route path="/account" element={<Account />} />
-            <Route path="/flashcardgen" element={<FlashcardGen />} />
+            <Route path="/generate" element={<MockGenerator />} />
             <Route path="*" element={"404"} />
           </Routes>
         </Box>

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Textarea, Button, Flex, Grid, Text, Skeleton } from "@chakra-ui/react";
 import Flashcard from "../components/Flashcard";
 
-export default function FlashcardGen() {
+export default function MockGenerator() {
   const [text, setText] = useState("");
   const [flashcards, setFlashcards] = useState<
     { term: string; definition: string }[]
