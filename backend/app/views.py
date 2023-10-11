@@ -1,4 +1,7 @@
 import json
+import os
+from dotenv import load_dotenv
+import openai
 from django.shortcuts import render,get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth import login, logout, authenticate
@@ -7,26 +10,12 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from .forms import UserCreationForm,FlashcardForm
-from .models import Deck,Flashcard
+from .models import Deck, Flashcard, DeckFlashcard
 # Create your views here.
 
-# Creating Flash Card
-def create_flashcard(request):
-    if request.method == 'POST':
-        form = FlashcardForm(request.POST)
-        if form.is_valid:
-            flashcard = form.save(commit=False)
-            flashcard.user = request.user   # Authenticated User
-            deck_id = request.POST.get('deck_id') # Getting deck associated with flashcard
-            deck = Deck.object.get(pk=deck_id)     
-            flashcard.deck = deck
-            flashcard.save()
-            return redirect('flashcard_list')   # Redirect to Flashcards page (Needs to be created)
-    else:
-        form = FlashcardForm()
-    return render(request,'flashcard_create.html',{
-        'form':form
-    })
+# Initialize OpenAI API Key
+load_dotenv()
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def index(request):
     return JsonResponse({'message': 'Hello, world!'})
@@ -59,6 +48,7 @@ def login_view(request):
             else:
                 return JsonResponse({"status": "error", "message": "Invalid username or password."})
         else:
+            print(form.errors)
             return JsonResponse({"status": "error", "message": "Invalid username or password."})
     return JsonResponse({"status": "invalid_method"})
 
@@ -71,14 +61,94 @@ def logout_view(request):
 def get_csrf_token(request):
     return JsonResponse({'status': "success", "message": "CSRF cookie set"})
 
+# Creating Deck
+@csrf_exempt
+def create_deck(request):
+    if request.method == 'POST':
+        # Assume you are receiving a block of text and deck_id as POST data
+        flashcard_content = request.POST.get('content', '')
+
+        try:
+            # Call OpenAI API to generate flashcards
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You will be provided with a block of text, and your task is to extract a list of terms and definitions from it as if you were generating flashcards in JSON format. Create a name for this deck of flashcards. Output example\n[\n  {\n    \"name\": \n  },\n  {\n    \"term\": \n    \"definition\":\n  },\n  {\n    \"term\": \n    \"definition\": \n  }\n]"
+                    },
+                    {
+                        "role": "user",
+                        "content": flashcard_content
+                    }
+                ],
+                temperature=0.5,
+                max_tokens=256,
+                top_p=1,
+                frequency_penalty=0,
+                presence_penalty=0
+            )
+            assistant_content = json.loads(response['choices'][0]['message']['content'])
+            # Extract the generated deck name and flashcards
+            deck_name = assistant_content[0]['name']
+            flashcards_data = assistant_content[1:]
+            # Create a new deck for this block of text
+            deck = Deck.objects.create(deck_name=deck_name, user=request.user)
+            # Create each generated flashcard and link it to the deck
+            for item in flashcards_data:
+                term = item['term']
+                definition = item['definition']
+                flashcard = Flashcard.objects.create(term=term, definition=definition, user=request.user)
+                DeckFlashcard.objects.create(deck=deck, flashcard=flashcard)
+
+            return JsonResponse({"status": "success", "message": "Flashcards and Deck created successfully."})
+        except json.JSONDecodeError:
+            return JsonResponse({"status": "error", "message": "Could not decode flashcards data from the API."})
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)})
+
+    return JsonResponse({"status": "invalid_method"})
+
+# Deleting Deck
+@csrf_exempt
+def delete_deck(request, deck_id):
+    deck = get_object_or_404(Deck, pk=deck_id)
+    if request.user == deck.user:
+        deck.delete()
+        return JsonResponse({"status": "success", "message": "Deck deleted successfully."})
+    else:
+        return JsonResponse({"status": "error", "message": "You do not have permission to delete this deck."})
+
+# Creating Flash Card
+@csrf_exempt
+def create_flashcard(request):
+    if request.method == 'POST':
+        form = FlashcardForm(request.POST)
+        if form.is_valid():
+            flashcard = form.save(commit=False)
+            flashcard.user = request.user  # Authenticated User
+            deck_id = request.POST.get('deck_id')  # Get the deck associated with the flashcard
+            
+            try:
+                deck = Deck.objects.get(pk=deck_id, user=request.user)  # Make sure the deck belongs to the user
+            except Deck.DoesNotExist:
+                return JsonResponse({"status": "error", "message": "Deck not found or you don't have permission to add to this deck."})
+            
+            flashcard.save()
+            DeckFlashcard.objects.create(deck=deck, flashcard=flashcard)
+            
+            return JsonResponse({"status": "success", "message": "Flashcard added to the deck successfully."})
+        else:
+            return JsonResponse({"status": "error", "message": form.errors})
+
+    return JsonResponse({"status": "invalid_method"})
 
 # Deleting Flash Card
+@csrf_exempt
 def delete_flashcard(request, flashcard_id):
     flashcard = get_object_or_404(Flashcard, pk=flashcard_id)
-
-    # Check if the user has permission to delete the flashcard
     if request.user == flashcard.user:
         flashcard.delete()
-        return redirect('flashcard_list')  # Redirect to Flashcards page (Needs to be created)
+        return JsonResponse({"status": "success", "message": "Flashcard deleted successfully."})
     else:
-        return render(request, 'flashcard_delete_error.html')  # Show an error page if the user doesn't have permission
+        return JsonResponse({"status": "error", "message": "You do not have permission to delete this flashcard."})
