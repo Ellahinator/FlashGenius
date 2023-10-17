@@ -25,4 +25,12 @@ urlpatterns = [
     path("login/", views.login_view, name="login"),
     path("logout/", views.logout_view, name="logout"),
     path("csrf_cookie", views.get_csrf_token, name="csrf"),
+    # URL pattern for creating a deck
+    path('deck/create/', views.create_deck, name='create_deck'),
+    # URL pattern for creating a flashcard
+    path('flashcard/create/', views.create_flashcard, name='create_flashcard'),
+    # URL pattern for deleting a Flashcard
+    path('flashcards/<int:flashcard_id>/delete/', views.delete_flashcard, name='delete_flashcard'),
+    # URL pattern for deleting a Deck
+    path('deck/<int:deck_id>/delete/', views.delete_deck, name='delete_deck'),
 ]

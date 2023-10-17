@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { EditIcon } from '@chakra-ui/icons'
 import {
@@ -57,3 +58,4 @@ const Account = () => {
   );
 };
 export default Account;
+

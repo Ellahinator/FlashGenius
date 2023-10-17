@@ -12,9 +12,73 @@ import {
   Heading,
   Text,
   useColorModeValue,
+  InputGroup,
+  InputRightElement
 } from "@chakra-ui/react";
+import { useState } from "react";
+import { Link as ReactRouterLink, useNavigate } from "react-router-dom";
+import { getCookie } from "typescript-cookie";
+import axios from "axios";
+import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+
 
 export default function LoginCard() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    username: "",
+    password: "",
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
+    setIsLoading(true);
+    setErrorMessage("");
+    e.preventDefault();
+    let csrftoken = await getCookie("csrftoken");
+    try {
+      const config = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrftoken,
+        },
+        withCredentials: true,
+      };
+
+      const response = await axios.post(
+        "http://127.0.0.1:8000/login/",
+        formData,
+        config
+      );
+      if ((response.data as any).status === "success") {
+        console.log("You are now logged in");
+        navigate("/");
+      } else {
+        console.log("An error occurred:", response.data.message);
+        setErrorMessage(response.data.message || "An error occurred.");
+      }
+      setIsLoading(false);
+    } catch (error: unknown) {
+      // Handle error
+      if (error instanceof Error) {
+        console.error("There was an error sending the data", error);
+        setErrorMessage(error.message || "An error occurred.");
+      } else {
+        console.error("An unknown error occurred", error);
+        setErrorMessage("An unknown error occurred.");
+      }
+      setIsLoading(false);
+    }
+  };
+
+  const handleChange = (e: { target: { name: any; value: any } }) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
   return (
     <Flex
       minH={"100vh"}
@@ -35,13 +99,27 @@ export default function LoginCard() {
           p={8}
         >
           <Stack spacing={4}>
-            <FormControl id="email">
-              <FormLabel>Email address</FormLabel>
-              <Input type="email" />
+            <FormControl id="username" isRequired >
+              <FormLabel>Username</FormLabel>
+              <Input type="text" name="username" onChange={handleChange} />
             </FormControl>
-            <FormControl id="password">
+            <FormControl id="password" isRequired>
               <FormLabel>Password</FormLabel>
-              <Input type="password" />
+              <InputGroup>
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  onChange={handleChange}
+                />
+                <InputRightElement>
+                  <Button
+                    variant={"ghost"}
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <ViewIcon /> : <ViewOffIcon />}
+                  </Button>
+                </InputRightElement>
+              </InputGroup>
             </FormControl>
             <Stack spacing={10}>
               <Stack
@@ -55,13 +133,16 @@ export default function LoginCard() {
                 </Text>
               </Stack>
               <Button
+                isLoading={isLoading}
+                loadingText="Logging in..."
                 bg={"orange.400"}
                 color={"white"}
                 _hover={{
                   bg: "blue.500",
                 }}
+                onClick={handleSubmit}
               >
-                Sign in
+                Login
               </Button>
             </Stack>
           </Stack>

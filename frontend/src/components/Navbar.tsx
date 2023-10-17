@@ -84,8 +84,9 @@ export default function Nav() {
                 </Menu>
               ) : (
                 <Button
-                  bg="orange.500"
-                  _hover={{ bg: "orange.600" }}
+                  colorScheme="orange"
+                  bg="orange.400"
+                  _hover={{ bg: "orange.500" }}
                   onClick={() => setIsLoggedIn(true)}
                 >
                   Login
