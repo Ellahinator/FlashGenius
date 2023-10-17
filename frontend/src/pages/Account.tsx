@@ -19,11 +19,11 @@ import {
 
 const Account = () => {
   const [formData, setFormData] = useState({
-    firstName: "Berk",
-    lastName: "Gulay",
-    email: "berkgulay@htht",
-    password: "12345",
-    profilePicture: "profile.png",
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    profilePicture: "",
   });
   const [isEditing , setIsEditing ] = useState(false)
   return (
