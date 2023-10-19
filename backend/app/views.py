@@ -42,19 +42,17 @@ def login_view(request):
     if request.method == "POST":
         data = json.loads(request.body.decode('utf-8'))
         print(data)
-        form = AuthenticationForm(request, data=data)
+        form = AuthenticationForm(request, data=data) 
         if form.is_valid():
             user=form.get_user()
             print(user)
             login(request, user)
             return JsonResponse({"status": "success", "message": f"You are now logged in as {user}."})
-            # else:
-            #     return JsonResponse({"status": "error", "message": "Invalid username or password."})
         else:
             print(form.errors)
             if username_exists(data['username']):
-                return JsonResponse({"status": "error", "message": "Invalid Password"})
-            return JsonResponse({"status": "error", "message": "Invalid Username"})
+                return JsonResponse({"status": "error", "errorType": "wrongPassword"})
+            return JsonResponse({"status": "error", "errorType": "wrongUsername"})
     return JsonResponse({"status": "invalid_method"})
 
 @csrf_exempt
