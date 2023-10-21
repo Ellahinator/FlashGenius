@@ -12,6 +12,7 @@ from django.contrib import messages
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from .forms import UserCreationForm,FlashcardForm
 from .models import Deck, Flashcard, DeckFlashcard
+from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.decorators import authentication_classes, permission_classes
@@ -27,10 +28,12 @@ def index(request):
     return JsonResponse({'message': 'Hello, world!'})
 
 # Protected route example
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
-def protected(request):
-    return JsonResponse({'message': 'You are authenticated.'})
+class ProtectedView(APIView):
+    authentication_classes = (JWTAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        return JsonResponse({'message': 'You are authenticated.'})
 
 def username_exists(username):
     return User.objects.filter(username=username).exists()
