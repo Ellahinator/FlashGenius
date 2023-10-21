@@ -152,3 +152,22 @@ def delete_flashcard(request, flashcard_id):
         return JsonResponse({"status": "success", "message": "Flashcard deleted successfully."})
     else:
         return JsonResponse({"status": "error", "message": "You do not have permission to delete this flashcard."})
+    
+
+# Editing Flash Card
+@csrf_exempt
+def edit_flashcard(request, flashcard_id):
+    if request.method == 'POST':
+        try:
+            flashcard = Flashcard.objects.get(pk=flashcard_id, user=request.user)  # Assuming 'user' is the user field in your Flashcard model
+        except Flashcard.DoesNotExist:
+            return JsonResponse({"status": "error", "message": "Flashcard not found or you don't have permission to edit it."})
+        
+        form = FlashcardForm(request.POST, instance=flashcard)  # Populate the form with the flashcard data
+        if form.is_valid():
+            updated_flashcard = form.save()
+            return JsonResponse({"status": "success", "message": "Flashcard updated successfully."})
+        else:
+            return JsonResponse({"status": "error", "message": form.errors})
+
+    return JsonResponse({"status": "invalid_method"})
