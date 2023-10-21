@@ -53,11 +53,17 @@ export default function LoginCard() {
         config
       );
       if ((response.data as any).status === "success") {
-        console.log("You are now logged in");
+        
         navigate("/");
       } else {
-        console.log("An error occurred:", response.data.message);
-        setErrorMessage(response.data.message || "An error occurred.");
+        const errorType = (response.data as any).errorType;
+        if (errorType === "wrongUsername") {
+          setErrorMessage("Invalid Username. Please try again.");
+        } else if (errorType === "wrongPassword") {
+          setErrorMessage("Invalid Password. Please try again.");
+        } else {
+          setErrorMessage(response.data.message || "An error occurred.");
+        }
       }
       setIsLoading(false);
     } catch (error: unknown) {
@@ -121,6 +127,11 @@ export default function LoginCard() {
                 </InputRightElement>
               </InputGroup>
             </FormControl>
+            {errorMessage && (
+              <Text color={"red.500"} fontSize={"sm"} align={"start"} >
+              {errorMessage}
+              </Text>
+          )}
             <Stack spacing={10}>
               <Stack
                 direction={{ base: "column", sm: "row" }}
