@@ -1,10 +1,81 @@
+import json
 from unittest.mock import patch
 from django.test import TestCase
 from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
-
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.test import APIClient
 from app.models import Deck, Flashcard
+
+class AuthenticationTests(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.client = APIClient()
+
+    def test_signup_view(self):
+        data = {
+            "username": "newtestuser",
+            "email": "newtestuser@example.com",
+            "password1": "testpassword",
+            "password2": "testpassword",
+        }
+        response = self.client.post(
+            reverse('signup_view'),
+            json.dumps(data),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('access_token', response.json())
+
+    def test_login_view(self):
+        data = {
+            "username": "testuser",
+            "password": "testpassword",
+        }
+        response = self.client.post(
+            reverse('login_view'),
+            json.dumps(data),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('access_token', response.json())
+
+        # Test wrong credentials
+        # Wrong Password
+        response = self.client.post(
+            reverse('login_view'),
+            json.dumps({'username': 'testuser', 'password': 'wrongpassword'}),
+            content_type='application/json'
+            )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['status'], 'error')
+
+        # Wrong Username
+        response = self.client.post(
+            reverse('login_view'),
+            json.dumps({'username': 'wrongtestuser', 'password': 'testpassword'}),
+            content_type='application/json'
+            )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['status'], 'error')
+
+    def test_protected_view(self):
+        # Obtain a JWT token
+        refresh = RefreshToken.for_user(self.user)
+        access_token = str(refresh.access_token)
+        
+        # Access protected view with token
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {access_token}')
+        response = self.client.get(reverse('protected'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['message'], 'You are authenticated.')
+
+        # Access protected view without token
+        self.client.credentials()
+        response = self.client.get(reverse('protected'))
+        self.assertEqual(response.status_code, 401)  # Unauthorized
 
 # Create your tests here.
 class FlashcardTests(TestCase):
