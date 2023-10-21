@@ -17,14 +17,21 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from app import views
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", views.index, name="home"),
+    path("protected/", views.protected, name="protected"),
     path("signup/", views.signup_view, name="signup"),
     path("login/", views.login_view, name="login"),
     path("logout/", views.logout_view, name="logout"),
     path("csrf_cookie", views.get_csrf_token, name="csrf"),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     # URL pattern for creating a deck
     path('deck/create/', views.create_deck, name='create_deck'),
     # URL pattern for creating a flashcard
