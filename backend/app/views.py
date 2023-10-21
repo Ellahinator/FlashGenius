@@ -12,6 +12,11 @@ from django.contrib import messages
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from .forms import UserCreationForm,FlashcardForm
 from .models import Deck, Flashcard, DeckFlashcard
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.decorators import authentication_classes, permission_classes
+from rest_framework.permissions import IsAuthenticated
+
 # Create your views here.
 
 # Initialize OpenAI API Key
@@ -20,6 +25,12 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def index(request):
     return JsonResponse({'message': 'Hello, world!'})
+
+# Protected route example
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def protected(request):
+    return JsonResponse({'message': 'You are authenticated.'})
 
 def username_exists(username):
     return User.objects.filter(username=username).exists()
@@ -31,8 +42,10 @@ def signup_view(request):
         form = UserCreationForm(data)
         if form.is_valid():
             user = form.save()
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)
             login(request, user)
-            return JsonResponse({"status": "success", "message": "Registration successful."})
+            return JsonResponse({"access_token": access_token, "status": "success", "message": "Registration successful."})
         else:
             return JsonResponse({"status": "error", "errors": form.errors})
     return JsonResponse({"status": "invalid_method"})
@@ -41,11 +54,13 @@ def signup_view(request):
 def login_view(request):
     if request.method == "POST":
         data = json.loads(request.body.decode('utf-8'))
-        form = AuthenticationForm(request, data=data) 
-        if form.is_valid():
-            user=form.get_user()
-            login(request, user)
-            return JsonResponse({"status": "success", "message": f"You are now logged in as {user}."})
+        username = data.get('username')
+        password = data.get('password')
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)
+            return JsonResponse({"access_token": access_token, "status": "success", "message": f"You are now logged in as {user}."})
         else:
             if username_exists(data['username']):
                 return JsonResponse({"status": "error", "errorType": "wrongPassword"})
@@ -62,6 +77,8 @@ def get_csrf_token(request):
     return JsonResponse({'status': "success", "message": "CSRF cookie set"})
 
 # Creating Deck
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 @csrf_exempt
 def create_deck(request):
     if request.method == 'POST':
