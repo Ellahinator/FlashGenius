@@ -48,27 +48,24 @@ export default function LoginCard() {
       };
 
       const response = await axios.post(
-        "http://127.0.0.1:8000/login/",
+        "http://127.0.0.1:8000/auth/login/",
         formData,
         config
       );
-      if ((response.data as any).status === "success") {
-        
+      if ((response.data as any).status === "success") {            
         navigate("/");
       } else {
-        const errorType = (response.data as any).errorType;
-        if (errorType === "wrongUsername") {
-          setErrorMessage("Invalid Username. Please try again.");
-        } else if (errorType === "wrongPassword") {
-          setErrorMessage("Invalid Password. Please try again.");
-        } else {
-          setErrorMessage(response.data.message || "An error occurred.");
-        }
+        console.error("An error occurred:", response.data.message);
+        
       }
       setIsLoading(false);
-    } catch (error: unknown) {
+    } catch (error: any) {
+      if (error.response){
+        let errorType= error.response.data.message
+        setErrorMessage(errorType);
+      }
       // Handle error
-      if (error instanceof Error) {
+      else if (error instanceof Error) {
         console.error("There was an error sending the data", error);
         setErrorMessage(error.message || "An error occurred.");
       } else {
