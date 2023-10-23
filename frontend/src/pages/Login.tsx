@@ -17,7 +17,7 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { Link as ReactRouterLink, useNavigate } from "react-router-dom";
-import { getCookie } from "typescript-cookie";
+import { getCookie, setCookie } from "typescript-cookie";
 import axios from "axios";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 
@@ -52,12 +52,25 @@ export default function LoginCard() {
         formData,
         config
       );
-      if ((response.data as any).status === "success") {            
-        navigate("/");
+      if (response.data.status === "success") {
+        let jwt_token= response.data.access_token
+        setCookie("jwt_token", jwt_token); 
+        const protectedRouteResponse = await axios.get("http://127.0.0.1:8000/protected/", {
+          headers: {
+            "Authorization": `Bearer ${jwt_token}`,
+          },
+        });
+
+        if (protectedRouteResponse.data.message === "You are authenticated.") {
+          console.log("Authenticated")
+          navigate("/");
+        } else {
+          console.error("Error accessing protected route");
+        }
       } else {
         console.error("An error occurred:", response.data.message);
-        
       }
+
       setIsLoading(false);
     } catch (error: any) {
       if (error.response){
