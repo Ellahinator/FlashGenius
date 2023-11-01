@@ -1,7 +1,8 @@
 
 import { useState, useEffect } from "react";
 import { EditIcon } from '@chakra-ui/icons'
-import {
+import { 
+  CloseButton,
   FormControl,
   FormLabel,
   FormErrorMessage,
@@ -28,6 +29,9 @@ const Account = () => {
     profilePicture: "",
   });
   const [isEditing , setIsEditing ] = useState(false)
+  const handleChange = (event:React.ChangeEvent<HTMLInputElement>)=>{
+    setFormData({...formData , [event.target.name]:event.target.value})
+  }
   return (
     <Flex
     minH={"100vh"}
@@ -56,21 +60,21 @@ const Account = () => {
   alt='Profile Pic'
 /></Center>
 <Flex justify={"flex-end"}> 
-<EditIcon/>
+{ !isEditing ?<EditIcon onClick={()=> setIsEditing(true)}/> : <CloseButton onClick={()=> setIsEditing(false)}/> }
 </Flex>
       <FormControl>
         <FormLabel>First Name</FormLabel>
-        <Input type="text" name="firstName" readOnly= {!isEditing ? true :false} value={formData.firstName} />
+        <Input type="text" name="firstName" readOnly= {!isEditing ? true :false} value={formData.firstName} onChange={handleChange} />
       </FormControl>
       <FormControl>
         <FormLabel>Last Name</FormLabel>
-        <Input type="text" name="lastName" readOnly= {!isEditing ? true :false} value={formData.lastName} />
+        <Input type="text" name="lastName" readOnly= {!isEditing ? true :false} value={formData.lastName} onChange={handleChange} />
       </FormControl>
       <FormControl>
         <FormLabel>Email address</FormLabel>
-        <Input type="email" name="email" readOnly= {!isEditing ? true :false} value={formData.email} />
+        <Input type="email" name="email" readOnly= {!isEditing ? true :false} value={formData.email} onChange={handleChange} />
       </FormControl>
-      <Button colorScheme="blue" mt={4} >Change Password</Button>
+      {isEditing && <Button colorScheme="blue" mt={4} >Submit Changes</Button>} 
 
       </Stack>
       </Box>
