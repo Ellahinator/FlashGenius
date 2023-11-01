@@ -13,7 +13,9 @@ import {
   Stack,
   Flex,
   Center,
-  Box
+  Box,
+  Heading,
+  useColorModeValue
 } from "@chakra-ui/react";
 
 
@@ -27,15 +29,32 @@ const Account = () => {
   });
   const [isEditing , setIsEditing ] = useState(false)
   return (
-    <div>
-        <Flex p = {6} direction={"column"} align={"center"}> 
-      <h1>Account Settings</h1>
-      <Image 
+    <Flex
+    minH={"100vh"}
+    justify={"center"}
+    bg={useColorModeValue("gray.50", "gray.800")}
+    >
+      <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12} px={6} w = {["95%","80%","70%"]}>
+        <Stack align={"center"}>
+         <Heading fontSize={"4xl"}>Account Settings</Heading>
+
+        </Stack>
+        <Box
+          rounded={"lg"}
+          bg={useColorModeValue("white", "gray.700")}
+          boxShadow={"lg"}
+          p={8}
+          w = {"100%"}
+        >
+        <Stack spacing={4}>
+          <Center>
+
+      <Image
   borderRadius='full'
   boxSize='150px'
-  src={`${process.env.PUBLIC_URL}/${formData.profilePicture}`}
+  src={`${process.env.PUBLIC_URL}/profile_pic.png`}
   alt='Profile Pic'
-/>
+/></Center>
 <Flex justify={"flex-end"}> 
 <EditIcon/>
 </Flex>
@@ -53,8 +72,10 @@ const Account = () => {
       </FormControl>
       <Button colorScheme="blue" mt={4} >Change Password</Button>
 
-      </Flex>
-    </div>
+      </Stack>
+      </Box>
+      </Stack>
+    </Flex>
   );
 };
 export default Account;
