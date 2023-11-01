@@ -18,7 +18,7 @@ interface DeckFlashcard {
 
 export default function FlashcardsDisplay () {
     const navigate = useNavigate();
-    const { deckId } = useParams(); // Assuming you're using deck_id as a route parameter
+    const { deckId } = useParams(); 
     const [flashcards, setFlashcards] = useState<DeckFlashcard[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [showBack, setShowBack] = useState(false);
@@ -38,7 +38,6 @@ export default function FlashcardsDisplay () {
             withCredentials: true,
           };
           const response = await axios.post(`http://127.0.0.1:8000/deck/get/`, {deck_id:deckId},config);
-          console.log(response.data)
           setFlashcards(response.data.flashcards);
         } catch (error) {
           console.error("Error fetching flashcards:", error);
@@ -51,14 +50,14 @@ export default function FlashcardsDisplay () {
     const nextFlashcard = () => {
       if (currentIndex < flashcards.length - 1) {
         setCurrentIndex(currentIndex + 1);
-        setShowBack(false); // Reset to front side on next card
+        setShowBack(false); 
       }
     };
   
     const prevFlashcard = () => {
       if (currentIndex > 0) {
         setCurrentIndex(currentIndex - 1);
-        setShowBack(false); // Reset to front side on prev card
+        setShowBack(false); 
       }
     };
   

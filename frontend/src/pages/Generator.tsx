@@ -36,7 +36,6 @@ export default function FlashcardGenerator () {
         withCredentials: true,
       };
       const response = await axios.post('http://127.0.0.1:8000/deck/create/', { content: text }, config);
-      console.log(response.data)
       if(response.data.deck_id){
         navigate(`/deck/${response.data.deck_id}`);
       }
