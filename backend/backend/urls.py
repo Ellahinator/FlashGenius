@@ -17,20 +17,19 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from app import views
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", views.index, name="home"),
-    path("signup/", views.signup_view, name="signup"),
-    path("login/", views.login_view, name="login"),
-    path("logout/", views.logout_view, name="logout"),
+    path("", views.IndexView.as_view(), name="home"),
+    path('protected/', views.ProtectedView.as_view(), name='protected'),
+    path("auth/<str:action>/", views.AuthView.as_view(), name="auth_view"),
     path("csrf_cookie", views.get_csrf_token, name="csrf"),
-    # URL pattern for creating a deck
-    path('deck/create/', views.create_deck, name='create_deck'),
-    # URL pattern for creating a flashcard
-    path('flashcard/create/', views.create_flashcard, name='create_flashcard'),
-    # URL pattern for deleting a Flashcard
-    path('flashcards/<int:flashcard_id>/delete/', views.delete_flashcard, name='delete_flashcard'),
-    # URL pattern for deleting a Deck
-    path('deck/<int:deck_id>/delete/', views.delete_deck, name='delete_deck'),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('deck/<str:action>/', views.DeckView.as_view(), name='deck_action'),
+    path('flashcards/<str:action>/', views.FlashcardView.as_view(), name='flashcards'),
 ]

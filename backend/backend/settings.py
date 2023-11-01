@@ -64,7 +64,14 @@ SESSION_COOKIE_SAMESITE = None
 CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SECURE = True
 
-REST_FRAMEWORK = {'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.AllowAny']}
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny'
+    ], 
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication'
+    ]
+}
 
 ROOT_URLCONF = "backend.urls"
 

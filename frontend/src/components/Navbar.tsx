@@ -21,11 +21,25 @@ import {
 } from "@chakra-ui/react";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 import { useState } from "react";
+import {removeCookie} from "typescript-cookie";
+import {useNavigate } from "react-router-dom";
+
 
 export default function Nav() {
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate()
+
+  const handleLogout= () => {
+    setIsLoggedIn(false);
+    removeCookie("jwt_token");
+  };
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+    navigate("/login")
+  }
 
   return (
     <>
@@ -77,7 +91,7 @@ export default function Nav() {
                     <Link href="/account">
                       <MenuItem>Account Settings</MenuItem>
                     </Link>
-                    <MenuItem onClick={() => setIsLoggedIn(false)}>
+                    <MenuItem onClick={handleLogout}>
                       Logout
                     </MenuItem>
                   </MenuList>
@@ -87,7 +101,7 @@ export default function Nav() {
                   colorScheme="orange"
                   bg="orange.400"
                   _hover={{ bg: "orange.500" }}
-                  onClick={() => setIsLoggedIn(true)}
+                  onClick={handleLogin}
                 >
                   Login
                 </Button>
