@@ -7,7 +7,6 @@ import SignupCard from "./pages/SignUp";
 import LoginCard from "./pages/Login";
 import Generator from "./pages/Generator";
 import FlashcardsDisplay from "./pages/FlashcardsDisplay";
-import './App.css';
 
 export const App = () => {
   return (
