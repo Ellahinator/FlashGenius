@@ -12,6 +12,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from .forms import UserCreationForm, FlashcardForm
 from .models import Deck, Flashcard, DeckFlashcard
+from .serializers import DeckSerializer, FlashcardSerializer, DeckFlashcardSerializer
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
@@ -92,12 +93,15 @@ class DeckView(APIView):
         elif action == 'delete':
             deck_id = request.data.get('deck_id')
             return self.delete_deck(request, deck_id)
+        elif action == 'get':
+            deck_id = request.data.get('deck_id')
+            return self.get_deck(request, deck_id)
         else:
             return Response({"message": "Invalid action."}, status=status.HTTP_400_BAD_REQUEST)
                             
     def create_deck(self, request):
         # Assume you are receiving a block of text and deck_id as POST data
-        flashcard_content = request.POST.get('content', '')
+        flashcard_content = request.data.get('content', '')
 
         try:
             # Call OpenAI API to generate flashcards
@@ -106,15 +110,14 @@ class DeckView(APIView):
                 messages=[
                     {
                         "role": "system",
-                        "content": "You will be provided with a block of text, and your task is to extract a list of terms and definitions from it as if you were generating flashcards in JSON format. Create a name for this deck of flashcards. Output example\n[\n  {\n    \"name\": \n  },\n  {\n    \"term\": \n    \"definition\":\n  },\n  {\n    \"term\": \n    \"definition\": \n  }\n]"
-                    },
+                        "content": """You will be provided with a block of text, and your task is to extract terms and definitions as flashcards in JSON format. Example: [{"name":"Deck Name"},{"term":"Term1","definition":"Definition1"},{"term":"Term2","definition":"Definition2"}]. If you're approaching the token limit, please end the response early in a way that ensures the output is well-formed JSON. """},
                     {
                         "role": "user",
                         "content": flashcard_content
                     }
                 ],
                 temperature=0.5,
-                max_tokens=256,
+                max_tokens=600,
                 top_p=1,
                 frequency_penalty=0,
                 presence_penalty=0
@@ -132,14 +135,13 @@ class DeckView(APIView):
                 flashcard = Flashcard.objects.create(term=term, definition=definition, user=request.user)
                 DeckFlashcard.objects.create(deck=deck, flashcard=flashcard)
 
-            return Response({"status": "success", "message": "Flashcards and Deck created successfully."}, status=status.HTTP_201_CREATED)
+            return Response({"status": "success", "deck_id": deck.deck_id,"message": "Flashcards and Deck created successfully." }, status=status.HTTP_201_CREATED)
         except json.JSONDecodeError:
             return Response({"status": "error", "message": "Could not decode flashcards data from the API."}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"status": "error", "message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
-    @csrf_exempt
     def delete_deck(self, request, deck_id):
         deck = get_object_or_404(Deck, pk=deck_id)
         if request.user == deck.user:
@@ -147,6 +149,27 @@ class DeckView(APIView):
             return Response({"status": "success", "message": "Deck deleted successfully."}, status=status.HTTP_200_OK)
         else:
             return Response({"status": "error", "message": "You do not have permission to delete this deck."}, status=status.HTTP_403_FORBIDDEN)
+    
+    @csrf_exempt
+    def get_deck(self, request, deck_id):
+        try:
+            deck = get_object_or_404(Deck, deck_id=deck_id)
+            
+            if request.user != deck.user:
+                return Response({"status": "error", "message": "You do not have permission to view this deck."}, status=status.HTTP_403_FORBIDDEN)
+            
+            deck_flashcards = DeckFlashcard.objects.filter(deck=deck).order_by('position')
+            serialized_deck = DeckSerializer(deck).data
+            serialized_flashcards = DeckFlashcardSerializer(deck_flashcards, many=True).data
+            
+            return Response({
+                "status": "success",
+                "deck": serialized_deck,
+                "flashcards": [fc['flashcard'] for fc in serialized_flashcards]
+            }, status=status.HTTP_200_OK)
+        
+        except Exception as e:
+            return Response({"status": "error", "message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class FlashcardView(APIView):
     authentication_classes = (JWTAuthentication,)
