@@ -32,4 +32,5 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('deck/<str:action>/', views.DeckView.as_view(), name='deck_action'),
     path('flashcards/<str:action>/', views.FlashcardView.as_view(), name='flashcards'),
+
 ]

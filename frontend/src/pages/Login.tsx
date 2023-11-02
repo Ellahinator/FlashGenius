@@ -63,7 +63,7 @@ export default function LoginCard() {
 
         if (protectedRouteResponse.data.message === "You are authenticated.") {
           console.log("Authenticated")
-          navigate("/");
+          navigate("/generate");
         } else {
           console.error("Error accessing protected route");
         }
@@ -104,9 +104,6 @@ export default function LoginCard() {
       <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12} px={6}>
         <Stack align={"center"}>
           <Heading fontSize={"4xl"}>Sign in to your account</Heading>
-          {/* <Text fontSize={'lg'} color={'gray.600'}>
-            to enjoy all of our cool <Text color={'blue.400'}>features</Text> ✌️
-          </Text> */}
         </Stack>
         <Box
           rounded={"lg"}
