@@ -89,14 +89,29 @@ class DeckTests(TestCase):
 
     @patch('openai.ChatCompletion.create')
     def test_create_deck_success(self, mock_openai_create):
-        mock_openai_create.return_value = {
+        # Adjust mock data to match the new expected format
+        mock_openai_response = {
             'choices': [
-                {'message': {'content': '[{"name": "Data Structures"}, {"term": "Array", "definition": "Definition of Array"}]'}}
+                {
+                    'message': {
+                        'content': json.dumps({
+                            "flashcards": [
+                                {"term": "Array", "definition": "Definition of Array"},
+                            ]
+                        })
+                    }
+                }
             ]
         }
+        mock_openai_create.return_value = mock_openai_response
+
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.access_token}')
-        response = self.client.post(reverse('deck_action', args=['create']), {'content': 'An array is ...'})
-        self.assertEqual(response.status_code, 201) 
+        # Include 'deck_name' in the data since your function expects it
+        response = self.client.post(reverse('deck_action', args=['create']), {
+            'content': 'An array is ...',
+            'deck_name': 'Test Deck Name'
+        })
+        self.assertEqual(response.status_code, 201)
 
     @patch('openai.ChatCompletion.create')
     def test_create_deck_api_error(self, mock_openai_create):
