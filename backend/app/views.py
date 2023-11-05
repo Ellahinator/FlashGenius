@@ -1,5 +1,7 @@
 import json
 import os
+import datetime
+import uuid
 from dotenv import load_dotenv
 import openai
 from django.shortcuts import render, get_object_or_404
@@ -102,32 +104,29 @@ class DeckView(APIView):
     def create_deck(self, request):
         # Assume you are receiving a block of text and deck_id as POST data
         flashcard_content = request.data.get('content', '')
+        # Retrieve the deck_name or generate a unique one if not provided
+        deck_name = request.data.get('deck_name', f"Deck-{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:8]}")
 
         try:
+            print("Calling OpenAI API...")
             # Call OpenAI API to generate flashcards
             response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
+                model="ft:gpt-3.5-turbo-0613:personal::8HcBduFx",
                 messages=[
                     {
                         "role": "system",
-                        "content": """You will be provided with a block of text, and your task is to extract terms and definitions as flashcards in JSON format. Example: [{"name":"Deck Name"},{"term":"Term1","definition":"Definition1"},{"term":"Term2","definition":"Definition2"}]. If you're approaching the token limit, please end the response early in a way that ensures the output is well-formed JSON. """},
+                        "content": "Given a block of text, extract key terms and their explanations, and format them into a set of flashcards in JSON format. Each flashcard contains a term and its corresponding definition."},
                     {
                         "role": "user",
                         "content": flashcard_content
                     }
-                ],
-                temperature=0.5,
-                max_tokens=600,
-                top_p=1,
-                frequency_penalty=0,
-                presence_penalty=0
+                ]
             )
+            # Parse the JSON string from the response
             assistant_content = json.loads(response['choices'][0]['message']['content'])
-            # Extract the generated deck name and flashcards
-            deck_name = assistant_content[0]['name']
-            flashcards_data = assistant_content[1:]
+            flashcards_data = assistant_content['flashcards']
             # Create a new deck for this block of text
-            deck = Deck.objects.create(deck_name=deck_name, user=request.user)
+            deck = Deck.objects.create(user=request.user, deck_name=deck_name)
             # Create each generated flashcard and link it to the deck
             for item in flashcards_data:
                 term = item['term']
