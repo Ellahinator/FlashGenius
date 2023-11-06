@@ -111,7 +111,7 @@ class DeckView(APIView):
             print("Calling OpenAI API...")
             # Call OpenAI API to generate flashcards
             response = openai.ChatCompletion.create(
-                model="ft:gpt-3.5-turbo-0613:personal::8HcBduFx",
+                model="ft:gpt-3.5-turbo-0613:personal::8HjCOVU3",
                 messages=[
                     {
                         "role": "system",

@@ -8,7 +8,12 @@ import {
   Button,
   Text,
   useColorModeValue,
-  VStack
+  VStack,
+  List,
+  ListItem,
+  Box,
+  SimpleGrid,
+
 } from "@chakra-ui/react";
 
 interface DeckFlashcard {
@@ -22,6 +27,7 @@ export default function FlashcardsDisplay () {
     const [flashcards, setFlashcards] = useState<DeckFlashcard[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [showBack, setShowBack] = useState(false);
+    const bgColor = useColorModeValue('gray.50', 'gray.700');
   
     useEffect(() => {
       const fetchFlashcards = async () => {
@@ -46,6 +52,26 @@ export default function FlashcardsDisplay () {
   
       fetchFlashcards();
     }, [deckId]);
+
+    const renderFlashcardList = () => {
+      return flashcards.map((flashcard, index) => (
+        <Box
+          key={index}
+          p={4}
+          borderWidth="1px"
+          borderRadius="lg"
+          overflow="hidden"
+          mb={2}
+          boxShadow="sm" // adds a slight shadow to each box
+          bg={bgColor} // adjusts color based on theme
+        >
+          <SimpleGrid columns={2} spacing={10}>
+            <Box fontWeight="bold">{flashcard.term}</Box>
+            <Box>{flashcard.definition}</Box>
+          </SimpleGrid>
+        </Box>
+      ));
+    };
   
     const nextFlashcard = () => {
       if (currentIndex < flashcards.length - 1) {
@@ -79,6 +105,12 @@ export default function FlashcardsDisplay () {
             →
           </Button>
         </VStack>
+        <VStack spacing={4} align="center">
+      {/* existing elements */}
+      <List spacing={2} w="50%" pt={5}>
+        {renderFlashcardList()}
+      </List>
+    </VStack>
       </VStack>
     );
   };
