@@ -7,23 +7,30 @@ import Nav from "./components/Navbar";
 import SignupCard from "./pages/SignUp";
 import LoginCard from "./pages/Login";
 import MockGenerator from "./pages/MockGenerator";
+import { createContext, useState } from "react";
+
+
+export const UserContext = createContext({loggedIn:false});
 
 export const App = () => {
+const [loggedIn,setLoggedIn] = useState(false);
   return (
     <BrowserRouter>
-      <ChakraProvider theme={theme}>
-        <Box textAlign="center" fontSize="xl">
-          <Nav />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/signup" element={<SignupCard />} />
-            <Route path="/login" element={<LoginCard />} />
-            <Route path="/account" element={<Account />} />
-            <Route path="/generate" element={<MockGenerator />} />
-            <Route path="*" element={"404"} />
-          </Routes>
-        </Box>
-      </ChakraProvider>
+      <UserContext.Provider value={{loggedIn:loggedIn}}>
+        <ChakraProvider theme={theme}>
+          <Box textAlign="center" fontSize="xl">
+            <Nav setLoggedIn ={setLoggedIn} loggedIn = {loggedIn}/>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/signup" element={<SignupCard />} />
+              <Route path="/login" element={<LoginCard setLoggedIn ={setLoggedIn} />} />
+              <Route path="/account" element={<Account />} />
+              <Route path="/generate" element={<MockGenerator />} />
+              <Route path="*" element={"404"} />
+            </Routes>
+          </Box>
+        </ChakraProvider>
+      </UserContext.Provider>
     </BrowserRouter>
   );
 };

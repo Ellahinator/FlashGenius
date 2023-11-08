@@ -15,14 +15,17 @@ import {
   InputGroup,
   InputRightElement
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useState , useContext, Dispatch , SetStateAction} from "react";
 import { Link as ReactRouterLink, useNavigate } from "react-router-dom";
 import { getCookie } from "typescript-cookie";
 import axios from "axios";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+import { UserContext } from "../App";
 
-
-export default function LoginCard() {
+interface LoginCardProps {
+  setLoggedIn: Dispatch<SetStateAction<boolean>>;
+}
+const  LoginCard: React.FC<LoginCardProps>= ({setLoggedIn}) =>  {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
@@ -31,6 +34,7 @@ export default function LoginCard() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+  const ctx = useContext(UserContext)
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     setIsLoading(true);
@@ -54,7 +58,8 @@ export default function LoginCard() {
       );
       if ((response.data as any).status === "success") {
         
-        navigate("/");
+        setLoggedIn(true);
+        navigate("/generate");
       } else {
         const errorType = (response.data as any).errorType;
         if (errorType === "wrongUsername") {
@@ -162,3 +167,4 @@ export default function LoginCard() {
     </Flex>
   );
 }
+export default LoginCard

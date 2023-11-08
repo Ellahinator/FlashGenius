@@ -20,12 +20,21 @@ import {
   Center,
 } from "@chakra-ui/react";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
-import { useState } from "react";
+import { useState, useContext,Dispatch,SetStateAction } from "react";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "../App";
 
-export default function Nav() {
+interface NavProps {
+  setLoggedIn: Dispatch<SetStateAction<boolean>>;
+  loggedIn:boolean
+}
+
+const  Nav: React.FC<NavProps>= ({setLoggedIn,loggedIn}) =>  {
+  const ctx = useContext(UserContext)
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <>
@@ -43,7 +52,7 @@ export default function Nav() {
                 {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
               </Button>
 
-              {isLoggedIn ? (
+              {ctx.loggedIn ? (
                 <Menu>
                   <MenuButton
                     as={Button}
@@ -77,7 +86,10 @@ export default function Nav() {
                     <Link href="/account">
                       <MenuItem>Account Settings</MenuItem>
                     </Link>
-                    <MenuItem onClick={() => setIsLoggedIn(false)}>
+                    <MenuItem onClick={() =>{ 
+                      setLoggedIn(false);
+                      navigate("/")
+                      } }>
                       Logout
                     </MenuItem>
                   </MenuList>
@@ -87,7 +99,7 @@ export default function Nav() {
                   colorScheme="orange"
                   bg="orange.400"
                   _hover={{ bg: "orange.500" }}
-                  onClick={() => setIsLoggedIn(true)}
+                  onClick={() => navigate("/login")}
                 >
                   Login
                 </Button>
@@ -99,3 +111,4 @@ export default function Nav() {
     </>
   );
 }
+export default Nav
