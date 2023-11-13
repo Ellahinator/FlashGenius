@@ -100,7 +100,25 @@ class DeckView(APIView):
             return self.get_deck(request, deck_id)
         else:
             return Response({"message": "Invalid action."}, status=status.HTTP_400_BAD_REQUEST)
-                            
+
+    def get(self, request):
+        """
+        Retrieve all decks for the current user.
+        """
+        try:
+            # Retrieve all decks for the logged-in user and order them as you prefer
+            user_decks = Deck.objects.filter(user=request.user)
+            serializer = DeckSerializer(user_decks, many=True)
+            return Response({
+                "status": "success",
+                "decks": serializer.data
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({
+                "status": "error",
+                "message": str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                                
     def create_deck(self, request):
         # Assume you are receiving a block of text and deck_id as POST data
         flashcard_content = request.data.get('content', '')
