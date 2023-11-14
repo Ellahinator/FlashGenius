@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { getCookie } from "typescript-cookie";
 import { Box, VStack, Text } from "@chakra-ui/react";
+import { Link } from 'react-router-dom';
 
 interface Deck {
-  deck_id: any;
-  deck_name: any;
-  // any other deck properties you have
+  deck_id: string;
+  deck_name: string;
+  term_count: number; 
 }
+
 
 export default function UserDecks() {
   const [decks, setDecks] = useState<Deck[]>([]);
@@ -25,7 +27,7 @@ export default function UserDecks() {
         setDecks(response.data.decks);
       } catch (error) {
         console.error("Error fetching decks:", error);
-        // handle errors, e.g., unauthorized user, no decks, etc.
+
       }
     };
 
@@ -33,12 +35,14 @@ export default function UserDecks() {
   }, []);
 
   return (
-    <VStack>
-      {decks.map((deck) => (
-        <Box key={deck.deck_id} p={5} shadow="md" borderWidth="1px">
-          <Text fontSize="xl">{deck.deck_name}</Text>
-          {/* You can add more details or actions for each deck here */}
-        </Box>
+    <VStack margin={8}>
+     {decks.map((deck) => (
+        <Link to={`/deck/${deck.deck_id}`} style={{ width: '70%' }}>
+          <Box key={deck.deck_id} p={5} shadow="md" borderWidth="1px" _hover={{ bg: 'gray.100' }} transition="background-color 0.2s">
+            <Text fontSize="xl">{deck.deck_name}</Text>
+            <Text fontSize="sm">{deck.term_count} Terms</Text>
+          </Box>
+        </Link>
       ))}
     </VStack>
   );

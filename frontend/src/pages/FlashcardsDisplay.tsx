@@ -13,7 +13,6 @@ import {
   Input,
   Box,
   SimpleGrid,
-  Center,
 
 } from "@chakra-ui/react";
 
@@ -84,8 +83,8 @@ export default function FlashcardsDisplay () {
           borderRadius="lg"
           overflow="hidden"
           mb={2}
-          boxShadow="sm" // adds a slight shadow to each box
-          bg={bgColor} // adjusts color based on theme
+          boxShadow="sm" 
+          bg={bgColor} 
         >
           <SimpleGrid columns={2} spacing={10}>
             <Box fontWeight="bold">{flashcard.term}</Box>
@@ -130,7 +129,6 @@ export default function FlashcardsDisplay () {
     </VStack>
         </VStack>
         <VStack spacing={4} align="center">
-      {/* existing elements */}
       <List spacing={2} w="50%" pt={5}>
         {renderFlashcardList()}
       </List>

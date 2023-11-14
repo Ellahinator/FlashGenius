@@ -107,11 +107,7 @@ class DeckView(APIView):
             return Response({"message": "Invalid action."}, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request):
-        """
-        Retrieve all decks for the current user.
-        """
         try:
-            # Retrieve all decks for the logged-in user and order them as you prefer
             user_decks = Deck.objects.filter(user=request.user)
             serializer = DeckSerializer(user_decks, many=True)
             return Response({
