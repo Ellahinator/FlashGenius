@@ -7,9 +7,13 @@ class FlashcardSerializer(serializers.ModelSerializer):
         fields = ('flashcard_id', 'term', 'definition')
 
 class DeckSerializer(serializers.ModelSerializer):
+    term_count = serializers.SerializerMethodField()
     class Meta:
         model = Deck
-        fields = ('deck_id', 'deck_name')
+        fields = ('deck_id', 'deck_name', 'term_count')
+
+    def get_term_count(self, obj):
+        return obj.flashcards.count()
 
 class DeckFlashcardSerializer(serializers.ModelSerializer):
     flashcard = FlashcardSerializer()

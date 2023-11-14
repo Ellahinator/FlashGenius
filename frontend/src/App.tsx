@@ -7,6 +7,7 @@ import SignupCard from "./pages/SignUp";
 import LoginCard from "./pages/Login";
 import Generator from "./pages/Generator";
 import FlashcardsDisplay from "./pages/FlashcardsDisplay";
+import UserDecks from "./pages/UserDecks";
 
 export const App = () => {
   return (
@@ -21,6 +22,7 @@ export const App = () => {
             <Route path="/account" element={<Account />} />
             <Route path="/generate" element={<Generator />} />
             <Route path="/deck/:deckId" element={<FlashcardsDisplay />} />
+            <Route path="/myDecks" element={<UserDecks/>}/>
             <Route path="*" element={"404"} />
           </Routes>
         </Box>
