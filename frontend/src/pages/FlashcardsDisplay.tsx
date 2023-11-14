@@ -10,9 +10,10 @@ import {
   useColorModeValue,
   VStack,
   List,
-  ListItem,
+  Input,
   Box,
   SimpleGrid,
+  Center,
 
 } from "@chakra-ui/react";
 
@@ -26,23 +27,44 @@ export default function FlashcardsDisplay () {
     const { deckId } = useParams(); 
     const [flashcards, setFlashcards] = useState<DeckFlashcard[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [newDeckName, setNewDeckName] = useState('');
     const [showBack, setShowBack] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [successMessage, setSuccessMessage] = useState('');
+
     const bgColor = useColorModeValue('gray.50', 'gray.700');
+
+    const jwt_token = getCookie("jwt_token")
+    const csrftoken = getCookie("csrftoken");
+    const config = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrftoken,
+        'Authorization': `Bearer ${jwt_token}`,
+      },
+      withCredentials: true,
+    };
+    
+    const saveNewDeckName = async () => {
+      try {
+        await axios.post(`http://127.0.0.1:8000/deck/update/`, {
+          deck_id: deckId,
+          deck_name: newDeckName
+        }, config);
+        setSuccessMessage('Deck name updated successfully!');
+        setErrorMessage('');
+      } catch (error:any) {
+        console.error("Error updating deck name:", error);
+        setErrorMessage('Error updating deck name: ' + error.message); 
+        setSuccessMessage('');
+      }
+    };
   
     useEffect(() => {
       const fetchFlashcards = async () => {
         try {
-          const jwt_token = getCookie("jwt_token")
-          const csrftoken = getCookie("csrftoken");
-          const config = {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-CSRFToken": csrftoken,
-              'Authorization': `Bearer ${jwt_token}`,
-            },
-            withCredentials: true,
-          };
+         
           const response = await axios.post(`http://127.0.0.1:8000/deck/get/`, {deck_id:deckId},config);
           setFlashcards(response.data.flashcards);
         } catch (error) {
@@ -88,7 +110,7 @@ export default function FlashcardsDisplay () {
     };
   
     return (
-      <VStack spacing={4} align="center">
+      <VStack spacing={4} align="center" marginBottom={20}>
         <Button onClick={() => navigate('/generate')}>Back to Flashcard Generator</Button>
         <Flashcard 
           front={flashcards[currentIndex]?.term} 
@@ -104,6 +126,8 @@ export default function FlashcardsDisplay () {
           <Button onClick={nextFlashcard} isDisabled={currentIndex === flashcards.length - 1}>
             →
           </Button>
+          <VStack width="100%" align="start">
+    </VStack>
         </VStack>
         <VStack spacing={4} align="center">
       {/* existing elements */}
@@ -111,6 +135,35 @@ export default function FlashcardsDisplay () {
         {renderFlashcardList()}
       </List>
     </VStack>
+    <form onSubmit={(e) => {
+        e.preventDefault();
+        saveNewDeckName();
+      }}>
+        <VStack>
+          <Input
+            placeholder="Enter deck name"
+            value={newDeckName}
+            onChange={(e)=>{
+              setNewDeckName(e.target.value)
+            }}
+            textAlign={"center"}
+          />
+          <Button type="submit" 
+          bg={"orange.500"}
+          color={"white"}
+          _hover={{
+            bg: "blue.500",
+          }}>
+            Save Deck 
+          </Button>
+        </VStack>
+      </form>
+      {successMessage && (
+        <Text color="green.500">{successMessage}</Text>
+      )}
+      {errorMessage && (
+        <Text color="red.500">{errorMessage}</Text>
+      )}
       </VStack>
     );
   };
