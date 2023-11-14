@@ -95,12 +95,31 @@ class DeckView(APIView):
         elif action == 'delete':
             deck_id = request.data.get('deck_id')
             return self.delete_deck(request, deck_id)
+        elif action == 'update':
+            deck_id = request.data.get('deck_id')
+            deck_name = request.data.get('deck_name')
+            return self.update_deck(request, deck_id, deck_name)
+
         elif action == 'get':
             deck_id = request.data.get('deck_id')
             return self.get_deck(request, deck_id)
         else:
             return Response({"message": "Invalid action."}, status=status.HTTP_400_BAD_REQUEST)
-                            
+
+    def get(self, request):
+        try:
+            user_decks = Deck.objects.filter(user=request.user)
+            serializer = DeckSerializer(user_decks, many=True)
+            return Response({
+                "status": "success",
+                "decks": serializer.data
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({
+                "status": "error",
+                "message": str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                                
     def create_deck(self, request):
         # Assume you are receiving a block of text and deck_id as POST data
         flashcard_content = request.data.get('content', '')
@@ -149,6 +168,18 @@ class DeckView(APIView):
         else:
             return Response({"status": "error", "message": "You do not have permission to delete this deck."}, status=status.HTTP_403_FORBIDDEN)
     
+    def update_deck(self, request, deck_id, deck_name):
+        try:
+            deck = get_object_or_404(Deck, pk=deck_id)
+            if request.user == deck.user:
+                deck.deck_name = deck_name
+                deck.save()
+                return Response({"status": "success", "message": "Deck name updated successfully."}, status=status.HTTP_200_OK)
+            else:
+                return Response({"status": "error", "message": "You do not have permission to update this deck."}, status=status.HTTP_403_FORBIDDEN)
+        except Exception as e:
+            return Response({"status": "error", "message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
     @csrf_exempt
     def get_deck(self, request, deck_id):
         try:

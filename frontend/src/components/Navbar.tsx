@@ -87,7 +87,9 @@ export default function Nav() {
                     </Center>
                     <br />
                     <MenuDivider />
-                    <MenuItem>Your Servers</MenuItem>
+                    <Link href="/myDecks">
+                      <MenuItem>My Decks</MenuItem>
+                    </Link>
                     <Link href="/account">
                       <MenuItem>Account Settings</MenuItem>
                     </Link>
