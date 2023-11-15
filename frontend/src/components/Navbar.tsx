@@ -34,6 +34,7 @@ export default function Nav() {
   const handleLogout= () => {
     setIsLoggedIn(false);
     removeCookie("jwt_token");
+    navigate("/login")
   };
 
   const handleLogin = () => {
