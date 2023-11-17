@@ -20,21 +20,27 @@ import {
   Center,
 } from "@chakra-ui/react";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
-import { useState, useContext,Dispatch,SetStateAction } from "react";
-import { useNavigate } from "react-router-dom";
-import { UserContext } from "../App";
+import { useState } from "react";
+import {removeCookie} from "typescript-cookie";
+import {useNavigate } from "react-router-dom";
 
-interface NavProps {
-  setLoggedIn: Dispatch<SetStateAction<boolean>>;
-  loggedIn:boolean
-}
 
-const  Nav: React.FC<NavProps>= ({setLoggedIn,loggedIn}) =>  {
-  const ctx = useContext(UserContext)
+export default function Nav() {
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const navigate = useNavigate();
+  const navigate = useNavigate()
+
+  const handleLogout= () => {
+    setIsLoggedIn(false);
+    removeCookie("jwt_token");
+    navigate("/login")
+  };
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+    navigate("/login")
+  }
 
   return (
     <>
@@ -82,14 +88,13 @@ const  Nav: React.FC<NavProps>= ({setLoggedIn,loggedIn}) =>  {
                     </Center>
                     <br />
                     <MenuDivider />
-                    <MenuItem>Your Servers</MenuItem>
+                    <Link href="/myDecks">
+                      <MenuItem>My Decks</MenuItem>
+                    </Link>
                     <Link href="/account">
                       <MenuItem>Account Settings</MenuItem>
                     </Link>
-                    <MenuItem onClick={() =>{ 
-                      setLoggedIn(false);
-                      navigate("/")
-                      } }>
+                    <MenuItem onClick={handleLogout}>
                       Logout
                     </MenuItem>
                   </MenuList>
@@ -99,7 +104,7 @@ const  Nav: React.FC<NavProps>= ({setLoggedIn,loggedIn}) =>  {
                   colorScheme="orange"
                   bg="orange.400"
                   _hover={{ bg: "orange.500" }}
-                  onClick={() => navigate("/login")}
+                  onClick={handleLogin}
                 >
                   Login
                 </Button>

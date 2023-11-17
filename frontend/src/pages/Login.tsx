@@ -17,7 +17,7 @@ import {
 } from "@chakra-ui/react";
 import { useState , useContext, Dispatch , SetStateAction} from "react";
 import { Link as ReactRouterLink, useNavigate } from "react-router-dom";
-import { getCookie } from "typescript-cookie";
+import { getCookie, setCookie } from "typescript-cookie";
 import axios from "axios";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { UserContext } from "../App";
@@ -52,28 +52,37 @@ const  LoginCard: React.FC<LoginCardProps>= ({setLoggedIn}) =>  {
       };
 
       const response = await axios.post(
-        "http://127.0.0.1:8000/login/",
+        "http://127.0.0.1:8000/auth/login/",
         formData,
         config
       );
-      if ((response.data as any).status === "success") {
-        
-        setLoggedIn(true);
-        navigate("/generate");
-      } else {
-        const errorType = (response.data as any).errorType;
-        if (errorType === "wrongUsername") {
-          setErrorMessage("Invalid Username. Please try again.");
-        } else if (errorType === "wrongPassword") {
-          setErrorMessage("Invalid Password. Please try again.");
+      if (response.data.status === "success") {
+        let jwt_token= response.data.access_token
+        setCookie("jwt_token", jwt_token); 
+        const protectedRouteResponse = await axios.get("http://127.0.0.1:8000/protected/", {
+          headers: {
+            "Authorization": `Bearer ${jwt_token}`,
+          },
+        });
+
+        if (protectedRouteResponse.data.message === "You are authenticated.") {
+          console.log("Authenticated")
+          navigate("/generate");
         } else {
-          setErrorMessage(response.data.message || "An error occurred.");
+          console.error("Error accessing protected route");
         }
+      } else {
+        console.error("An error occurred:", response.data.message);
       }
+
       setIsLoading(false);
-    } catch (error: unknown) {
+    } catch (error: any) {
+      if (error.response){
+        let errorType= error.response.data.message
+        setErrorMessage(errorType);
+      }
       // Handle error
-      if (error instanceof Error) {
+      else if (error instanceof Error) {
         console.error("There was an error sending the data", error);
         setErrorMessage(error.message || "An error occurred.");
       } else {
@@ -99,9 +108,6 @@ const  LoginCard: React.FC<LoginCardProps>= ({setLoggedIn}) =>  {
       <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12} px={6}>
         <Stack align={"center"}>
           <Heading fontSize={"4xl"}>Sign in to your account</Heading>
-          {/* <Text fontSize={'lg'} color={'gray.600'}>
-            to enjoy all of our cool <Text color={'blue.400'}>features</Text> ✌️
-          </Text> */}
         </Stack>
         <Box
           rounded={"lg"}
