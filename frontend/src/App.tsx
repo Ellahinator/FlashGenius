@@ -10,6 +10,7 @@ import FlashcardsDisplay from "./pages/FlashcardsDisplay";
 import UserDecks from "./pages/UserDecks";
 
 export const App = () => {
+const [loggedIn,setLoggedIn] = useState(false);
   return (
     <BrowserRouter>
       <ChakraProvider theme={theme}>

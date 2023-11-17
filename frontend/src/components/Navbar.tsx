@@ -58,7 +58,7 @@ export default function Nav() {
                 {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
               </Button>
 
-              {isLoggedIn ? (
+              {ctx.loggedIn ? (
                 <Menu>
                   <MenuButton
                     as={Button}
@@ -116,3 +116,4 @@ export default function Nav() {
     </>
   );
 }
+export default Nav
