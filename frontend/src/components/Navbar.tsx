@@ -21,25 +21,24 @@ import {
 } from "@chakra-ui/react";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 import { useState } from "react";
-import {removeCookie} from "typescript-cookie";
-import {useNavigate } from "react-router-dom";
-
+import { removeCookie } from "typescript-cookie";
+import { useNavigate } from "react-router-dom";
 
 export default function Nav() {
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const handleLogout= () => {
+  const handleLogout = () => {
     setIsLoggedIn(false);
     removeCookie("jwt_token");
   };
 
   const handleLogin = () => {
     setIsLoggedIn(true);
-    navigate("/login")
-  }
+    navigate("/login");
+  };
 
   return (
     <>
@@ -52,10 +51,19 @@ export default function Nav() {
           </Box>
 
           <Flex alignItems={"center"}>
-            <Stack direction={"row"} spacing={7}>
-              <Button onClick={toggleColorMode} background={"transparent"}>
-                {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
-              </Button>
+            <Stack direction={"row"} spacing={7} align="center">
+              <Link href="#" style={{ fontSize: "1rem" }}>
+                Features
+              </Link>
+              <Link href="#" style={{ fontSize: "1rem" }}>
+                Pricing
+              </Link>
+              <Link href="#" style={{ fontSize: "1rem" }}>
+                About
+              </Link>
+              <Link href="#" style={{ fontSize: "1rem" }}>
+                Contact
+              </Link>
 
               {isLoggedIn ? (
                 <Menu>
@@ -93,9 +101,7 @@ export default function Nav() {
                     <Link href="/account">
                       <MenuItem>Account Settings</MenuItem>
                     </Link>
-                    <MenuItem onClick={handleLogout}>
-                      Logout
-                    </MenuItem>
+                    <MenuItem onClick={handleLogout}>Logout</MenuItem>
                   </MenuList>
                 </Menu>
               ) : (
@@ -108,6 +114,9 @@ export default function Nav() {
                   Login
                 </Button>
               )}
+              <Button onClick={toggleColorMode} background={"transparent"}>
+                {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+              </Button>
             </Stack>
           </Flex>
         </Flex>
