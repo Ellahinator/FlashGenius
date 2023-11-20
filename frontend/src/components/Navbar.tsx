@@ -66,7 +66,7 @@ export default function Nav() {
                 Contact
               </Link>
 
-              {ctx.loggedIn ? (
+              {isLoggedIn ? (
                 <Menu>
                   <MenuButton
                     as={Button}
@@ -125,4 +125,3 @@ export default function Nav() {
     </>
   );
 }
-export default Nav

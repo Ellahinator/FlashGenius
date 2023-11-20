@@ -15,17 +15,14 @@ import {
   InputGroup,
   InputRightElement
 } from "@chakra-ui/react";
-import { useState , useContext, Dispatch , SetStateAction} from "react";
+import { useState } from "react";
 import { Link as ReactRouterLink, useNavigate } from "react-router-dom";
 import { getCookie, setCookie } from "typescript-cookie";
 import axios from "axios";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
-import { UserContext } from "../App";
 
-interface LoginCardProps {
-  setLoggedIn: Dispatch<SetStateAction<boolean>>;
-}
-const  LoginCard: React.FC<LoginCardProps>= ({setLoggedIn}) =>  {
+
+export default function LoginCard() {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
@@ -34,7 +31,6 @@ const  LoginCard: React.FC<LoginCardProps>= ({setLoggedIn}) =>  {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
-  const ctx = useContext(UserContext)
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     setIsLoading(true);
@@ -173,4 +169,3 @@ const  LoginCard: React.FC<LoginCardProps>= ({setLoggedIn}) =>  {
     </Flex>
   );
 }
-export default LoginCard
