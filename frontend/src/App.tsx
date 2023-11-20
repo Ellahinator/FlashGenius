@@ -11,7 +11,6 @@ import UserDecks from "./pages/UserDecks";
 import Footer from "./components/Footer";
 
 export const App = () => {
-const [loggedIn,setLoggedIn] = useState(false);
   return (
     <BrowserRouter>
       <ChakraProvider theme={theme}>
