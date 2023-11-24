@@ -7,7 +7,8 @@ import {
   Text,
   Button,
   Image,
-  Link,
+  Link as ChakraLink,
+  LinkProps,
   Menu,
   MenuButton,
   MenuList,
@@ -22,7 +23,8 @@ import {
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import { removeCookie } from "typescript-cookie";
-import { useNavigate } from "react-router-dom";
+import {useNavigate, Link as ReactRouterLink } from "react-router-dom";
+
 
 export default function Nav() {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -46,25 +48,25 @@ export default function Nav() {
       <Box px={4}>
         <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
           <Box>
-            <Link href="/">
+          <ChakraLink as ={ReactRouterLink} to ="/">
               <Image src="logo256.png" boxSize="48px" objectFit="cover" />
-            </Link>
+            </ChakraLink>
           </Box>
 
           <Flex alignItems={"center"}>
             <Stack direction={"row"} spacing={7} align="center">
-              <Link href="#" style={{ fontSize: "1rem" }}>
+              <ChakraLink as ={ReactRouterLink} to ="#" style={{ fontSize: "1rem" }}>
                 Features
-              </Link>
-              <Link href="#" style={{ fontSize: "1rem" }}>
+              </ChakraLink>
+              <ChakraLink as ={ReactRouterLink} to ="#" style={{ fontSize: "1rem" }}>
                 Pricing
-              </Link>
-              <Link href="#" style={{ fontSize: "1rem" }}>
+              </ChakraLink>
+              <ChakraLink as ={ReactRouterLink} to ="#" style={{ fontSize: "1rem" }}>
                 About
-              </Link>
-              <Link href="#" style={{ fontSize: "1rem" }}>
+              </ChakraLink>
+              <ChakraLink as ={ReactRouterLink} to ="#" style={{ fontSize: "1rem" }}>
                 Contact
-              </Link>
+              </ChakraLink>
 
               {isLoggedIn ? (
                 <Menu>
@@ -96,12 +98,12 @@ export default function Nav() {
                     </Center>
                     <br />
                     <MenuDivider />
-                    <Link href="/myDecks">
+                    <ChakraLink as ={ReactRouterLink} to="/myDecks">
                       <MenuItem>My Decks</MenuItem>
-                    </Link>
-                    <Link href="/account">
+                    </ChakraLink>
+                    <ChakraLink as ={ReactRouterLink} to ="/account">
                       <MenuItem>Account Settings</MenuItem>
-                    </Link>
+                    </ChakraLink>
                     <MenuItem onClick={handleLogout}>Logout</MenuItem>
                   </MenuList>
                 </Menu>
