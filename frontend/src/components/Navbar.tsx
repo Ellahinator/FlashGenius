@@ -39,7 +39,6 @@ export default function Nav() {
   };
 
   const handleLogin = () => {
-    setIsLoggedIn(true);
     navigate("/login");
   };
 
