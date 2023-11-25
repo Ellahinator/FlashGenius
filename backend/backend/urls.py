@@ -27,11 +27,11 @@ urlpatterns = [
     path("", views.IndexView.as_view(), name="home"),
     path('protected/', views.ProtectedView.as_view(), name='protected'),
     path("auth/<str:action>/", views.AuthView.as_view(), name="auth_view"),
+    path('user-info/', views.get_user_info, name='get_user_info'),
     path("csrf_cookie", views.get_csrf_token, name="csrf"),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('deck/<str:action>/', views.DeckView.as_view(), name='deck_action'),
     path('decks/', views.DeckView.as_view(), name='deck_list'),
     path('flashcards/<str:action>/', views.FlashcardView.as_view(), name='flashcards'),
-
 ]
