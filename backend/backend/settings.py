@@ -28,10 +28,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-# Set session cookie age to 1 day (adjust as needed)
-SESSION_COOKIE_AGE = 24 * 60 * 60
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -66,7 +62,7 @@ CSRF_TRUSTED_ORIGINS = ['http://localhost:3000', 'http://127.0.0.1:3000']
 SESSION_COOKIE_SAMESITE = None
 CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SAMESITE = None
+SESSION_COOKIE_AGE = 24 * 60 * 60 # Set session cookie age to 1 day (adjust as needed)
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
