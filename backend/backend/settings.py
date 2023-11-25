@@ -28,6 +28,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Set session cookie age to 1 day (adjust as needed)
+SESSION_COOKIE_AGE = 24 * 60 * 60
+
 
 # Application definition
 
