@@ -56,8 +56,7 @@ class AuthView(APIView):
         form = UserCreationForm(data)
         if form.is_valid():
             user = form.save()
-            refresh = RefreshToken.for_user(user)
-            access_token = str(refresh.access_token)
+            access_token = create_jwt_with_user_info(user)
             login(request, user)
             return Response({"status": "success", "access_token": access_token, "message": "Registration successful."}, status=status.HTTP_201_CREATED)
         else:
@@ -68,8 +67,7 @@ class AuthView(APIView):
         password = data.get('password')
         user = authenticate(username=username, password=password)
         if user is not None:
-            refresh = RefreshToken.for_user(user)
-            access_token = str(refresh.access_token)
+            access_token = create_jwt_with_user_info(user)
             return Response({"status": "success", "access_token": access_token, "message": f"You are now logged in as {user}."}, status=status.HTTP_200_OK)
         else:
             if username_exists(username):
@@ -79,6 +77,16 @@ class AuthView(APIView):
     def logout(self, request):
         logout(request)
         return Response({"status": "success", "message": "Successfully logged out."}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_info(request):
+    user = request.user
+    return Response({
+        'user_id': user.id,
+        'username': user.username,
+        'email': user.email
+    })
 
 @ensure_csrf_cookie
 def get_csrf_token(request):
@@ -261,7 +269,6 @@ class FlashcardView(APIView):
             return Response({"status": "error", "message": form.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 # Helper functions
 
 def username_exists(username):
@@ -274,3 +281,10 @@ def parse_request_body(request):
     except json.JSONDecodeError:
         return None
     
+def create_jwt_with_user_info(user):
+    refresh = RefreshToken.for_user(user)
+
+    refresh['user_id'] = user.id
+
+    return str(refresh.access_token)
+
