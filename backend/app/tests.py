@@ -76,6 +76,42 @@ class AuthenticationTests(TestCase):
         self.client.credentials()
         response = self.client.get(reverse('protected'))
         self.assertEqual(response.status_code, 401)  # Unauthorized
+    def test_change_password(self):
+
+        self.client.force_authenticate(user=self.user)
+
+        data = {
+            "old_password":"testpassword",
+            "new_password1":"newtestpassword",
+            "new_password2":"newtestpassword"
+        }
+
+        # Make a password change request
+        response = self.client.post('/auth/change_password/',data,format='json')
+
+        # Check if response status is ok
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.data['status'],'success')
+
+        self.user.refresh_from_db()
+
+        # Check if password has changed successfully
+        self.assertTrue(self.user.check_password('newtestpassword'))
+
+    def test_change_password_invalid_data(self):
+
+        self.client.force_authenticate(user=self.user)
+
+        # Test for invalid data
+        invalid_data = {
+            "old_password":"testpassword",
+            "new_password1":"newtestpassword"
+        }
+        response = self.client.post('/auth/change_password/',invalid_data,format='json')
+        self.assertEqual(response.status_code,400)
+        self.assertTrue(response.data['status'],'error')
+        self.assertTrue(self.user.check_password,'testpassword')
+
 
 class DeckTests(TestCase):
     def setUp(self):
