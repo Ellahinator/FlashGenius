@@ -15,7 +15,8 @@ from rest_framework.permissions import IsAuthenticated
 from .forms import UserCreationForm, FlashcardForm
 from .models import Deck, Flashcard, DeckFlashcard
 from .serializers import DeckSerializer, FlashcardSerializer, DeckFlashcardSerializer
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import login, logout, authenticate,update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 # Create your views here.
@@ -49,6 +50,8 @@ class AuthView(APIView):
             return self.login(request, data)
         elif action == 'logout':
             return self.logout(request)
+        elif action == 'change_password':
+            return self.change_password(request,data)
         
         return Response({"status": "error", "message": "Invalid action."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -77,6 +80,19 @@ class AuthView(APIView):
     def logout(self, request):
         logout(request)
         return Response({"status": "success", "message": "Successfully logged out."}, status=status.HTTP_200_OK)
+
+    def change_password(self,request,data):
+        
+        user = request.user
+        form = PasswordChangeForm(user,data)
+        if form.is_valid():
+            user = form.save()
+            # Update the session to prevent the user from being logged out after changing the password
+            update_session_auth_hash(request,user)
+            return Response({"status":"success","message":"Password changed successfully"},status=status.HTTP_200_OK)
+        else:
+            return Response({"status":"error","errors":form.errors},status=status.HTTP_400_BAD_REQUEST) 
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
