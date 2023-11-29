@@ -25,16 +25,19 @@ import { useState } from "react";
 import { removeCookie } from "typescript-cookie";
 import {useNavigate, Link as ReactRouterLink } from "react-router-dom";
 
+interface NavProps{
+  token:string;
+  logout:()=> void;
+}
 
-export default function Nav() {
+export default function Nav({token,logout}:NavProps) {
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
-    removeCookie("jwt_token");
+    logout()
     navigate("/login")
   };
 
@@ -67,7 +70,7 @@ export default function Nav() {
                 Contact
               </ChakraLink>
 
-              {isLoggedIn ? (
+              {token ? (
                 <Menu>
                   <MenuButton
                     as={Button}
