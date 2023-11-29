@@ -21,8 +21,12 @@ import { getCookie, setCookie } from "typescript-cookie";
 import axios from "axios";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 
+interface LoginCardProps{
+  login:(value:string)=> void;
+}
 
-export default function LoginCard() {
+
+export default function LoginCard({login}:LoginCardProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
@@ -54,7 +58,7 @@ export default function LoginCard() {
       );
       if (response.data.status === "success") {
         let jwt_token= response.data.access_token
-        setCookie("jwt_token", jwt_token); 
+        login(jwt_token)
         const protectedRouteResponse = await axios.get("http://127.0.0.1:8000/protected/", {
           headers: {
             "Authorization": `Bearer ${jwt_token}`,
