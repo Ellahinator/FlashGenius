@@ -21,8 +21,8 @@ import {
   Center,
 } from "@chakra-ui/react";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
-import { useEffect, useState } from "react";
-import { removeCookie, getCookie } from "typescript-cookie";
+import { useState } from "react";
+import { removeCookie } from "typescript-cookie";
 import {useNavigate, Link as ReactRouterLink } from "react-router-dom";
 
 interface NavProps{
@@ -44,13 +44,6 @@ export default function Nav({token,logout}:NavProps) {
   const handleLogin = () => {
     navigate("/login");
   };
-
-  useEffect(() => {
-    const jwt_token = getCookie("jwt_token");
-    if (jwt_token) {
-      setIsLoggedIn(true);
-    }
-  }, []);
 
   return (
     <>
