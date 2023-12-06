@@ -15,8 +15,10 @@ import {
   Box,
   SimpleGrid,
   Flex,
+  Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, useDisclosure, Textarea, useClipboard
 } from "@chakra-ui/react";
 import { DeleteIcon } from "@chakra-ui/icons";
+import {  } from "@chakra-ui/react";
 
 export default function FlashcardsDisplay() {
   const navigate = useNavigate();
@@ -27,6 +29,19 @@ export default function FlashcardsDisplay() {
   const [showBack, setShowBack] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [exportData, setExportData] = useState("");
+  const { hasCopied, onCopy } = useClipboard(exportData);
+
+  const generateExportData = () => {
+    let formattedData = flashcards.map(flashcard => `${flashcard.term},${flashcard.definition}`).join(';');
+    setExportData(formattedData);
+  };
+
+  const handleExport = () => {
+    generateExportData();
+    onOpen();
+  };
 
   const bgColor = useColorModeValue("gray.50", "gray.700");
 
@@ -195,6 +210,23 @@ export default function FlashcardsDisplay() {
           >
             Save Deck
           </Button>
+          <Button onClick={handleExport}>Export</Button>
+    
+    <Modal isOpen={isOpen} onClose={onClose} size={"lg"}>
+      <ModalOverlay />
+      <ModalContent >
+        <ModalHeader>Export to Quizlet</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <Textarea height={"lg"} value={exportData} isReadOnly />
+        </ModalBody>
+        <ModalFooter>
+          <Button onClick={onCopy} bg={"orange.500"} color={"white"} _hover={{ bg: "blue.500" }}>
+            {hasCopied ? "Copied!" : "Copy"}
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
         </VStack>
       </form>
       {successMessage && <Text color="green.500">{successMessage}</Text>}
