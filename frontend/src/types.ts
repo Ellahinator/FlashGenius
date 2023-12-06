@@ -1,6 +1,7 @@
 export interface DeckFlashcard {
   term: string;
   definition: string;
+  flashcard_id: number;
 }
 
 export interface Deck {
