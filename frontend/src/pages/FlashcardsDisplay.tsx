@@ -14,7 +14,9 @@ import {
   Input,
   Box,
   SimpleGrid,
+  Flex,
 } from "@chakra-ui/react";
+import { DeleteIcon } from "@chakra-ui/icons";
 
 export default function FlashcardsDisplay() {
   const navigate = useNavigate();
@@ -62,26 +64,49 @@ export default function FlashcardsDisplay() {
   };
 
   useEffect(() => {
-    const fetchFlashcards = async () => {
-      try {
-        const response = await axios.post(
-          `http://127.0.0.1:8000/deck/get/`,
-          { deck_id: deckId },
-          config
-        );
-        setFlashcards(response.data.flashcards);
-      } catch (error) {
-        console.error("Error fetching flashcards:", error);
-      }
-    };
-
+    
     fetchFlashcards();
   }, [deckId]);
 
+  const fetchFlashcards = async () => {
+    try {
+      const response = await axios.post(
+        `http://127.0.0.1:8000/deck/get/`,
+        { deck_id: deckId },
+        config
+      );
+      console.log("flashcards",response.data.flashcards)
+      setFlashcards(response.data.flashcards);
+    } catch (error) {
+      console.error("Error fetching flashcards:", error);
+    }
+  };
+
+  const handleDelete =async (flashcardId: number) => {
+    try {
+      const jwt_token = getCookie("jwt_token")
+      const csrftoken = getCookie("csrftoken");
+      const config = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrftoken,
+          'Authorization': `Bearer ${jwt_token}`,
+        },
+        withCredentials: true,
+      };
+      await axios.post('http://127.0.0.1:8000/flashcards/delete/', { flashcard_id: flashcardId }, config);
+      fetchFlashcards()
+    } catch (error) {
+      console.error(error)
+    }
+    
+  }
+
   const renderFlashcardList = () => {
     return flashcards.map((flashcard, index) => (
+      <Flex key={index} justify="center" align="center">
       <Box
-        key={index}
         p={4}
         borderWidth="1px"
         borderRadius="lg"
@@ -95,6 +120,8 @@ export default function FlashcardsDisplay() {
           <Box>{flashcard.definition}</Box>
         </SimpleGrid>
       </Box>
+      <DeleteIcon ml = "15px" color="red" onClick={()=>handleDelete(flashcard.flashcard_id)}/>
+      </Flex>
     ));
   };
 
