@@ -206,9 +206,11 @@ class FlashcardTests(TestCase):
     def test_edit_flashcard(self):
         flashcard = Flashcard.objects.create(term="Original Term", definition="Original Definition", user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.access_token}')
-        response = self.client.post(
+        response = self.client.put(
             reverse('flashcards', args=['edit']),
             {'flashcard_id': flashcard.flashcard_id, 'term': 'Updated Term', 'definition': 'Updated Definition'},
+            format='json'
         )
         self.assertEqual(response.status_code, 200)  # OK
         self.assertEqual(response.json()['message'], "Flashcard updated successfully.")
+
