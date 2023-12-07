@@ -237,10 +237,6 @@ class FlashcardView(APIView):
             flashcard_id = request.data.get('flashcard_id')
             if flashcard_id:
                 return self.delete_flashcard(request, flashcard_id)
-        elif action == 'edit':
-            flashcard_id = request.data.get('flashcard_id')
-            if flashcard_id:
-                return self.edit_flashcard(request, flashcard_id)
         
         return Response({"status": "error", "message": "Invalid action."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -271,18 +267,36 @@ class FlashcardView(APIView):
         else:
             return Response({"status": "error", "message": "You do not have permission to delete this flashcard."}, status=status.HTTP_403_FORBIDDEN)
 
+    def put(self, request, action):
+        if action == 'edit':
+            flashcard_id = request.data.get('flashcard_id')
+            if flashcard_id:
+                return self.edit_flashcard(request, flashcard_id)
+            else:
+                return Response({"status": "error", "message": "Flashcard ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"status": "error", "message": "Invalid action."}, status=status.HTTP_400_BAD_REQUEST)
+
     def edit_flashcard(self, request, flashcard_id):
         try:
-            flashcard = Flashcard.objects.get(pk=flashcard_id, user=request.user)  # Assuming 'user' is the user field in your Flashcard model
+            flashcard = Flashcard.objects.get(pk=flashcard_id, user=request.user)
         except Flashcard.DoesNotExist:
             return Response({"status": "error", "message": "Flashcard not found or you don't have permission to edit it."}, status=status.HTTP_400_BAD_REQUEST)
 
-        form = FlashcardForm(request.POST, instance=flashcard)  # Populate the form with the flashcard data
-        if form.is_valid():
-            updated_flashcard = form.save()
-            return Response({"status": "success", "message": "Flashcard updated successfully."}, status=status.HTTP_200_OK)
-        else:
-            return Response({"status": "error", "message": form.errors}, status=status.HTTP_400_BAD_REQUEST)
+        # Update fields only if they are provided in the request
+        term = request.data.get('term', None)
+        definition = request.data.get('definition', None)
+
+        if term is not None:
+            flashcard.term = term
+        if definition is not None:
+            flashcard.definition = definition
+
+        flashcard.save()
+        return Response({"status": "success", "message": "Flashcard updated successfully."}, status=status.HTTP_200_OK)
+
+
+
 
 
 # Helper functions
