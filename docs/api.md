@@ -5,15 +5,15 @@
 1. [Introduction](#introduction)
 2. [Authentication](#authentication)
 3. [Endpoints](#endpoints)
-   - [GET /csrf_cookie](#get-csrf_cookie)
-   - [POST /auth/signup](#post-authsignup)
-   - [POST /auth/login](#post-authlogin)
-   - [POST /auth/logout](#post-authlogout)
-   - [POST /deck/create](#post-deckcreate)
-   - [POST /deck/delete](#post-deckdelete)
-   - [POST /flashcards/create](#post-flashcardscreate)
-   - [POST /flashcards/delete](#post-flashcardsdelete)
-   - [POST /flashcards/edit](#post-flashcardsedit)
+   - [GET /csrf_cookie/](#get-csrf_cookie)
+   - [POST /auth/signup/](#post-authsignup)
+   - [POST /auth/login/](#post-authlogin)
+   - [POST /auth/logout/](#post-authlogout)
+   - [POST /deck/create/](#post-deckcreate)
+   - [POST /deck/delete/](#post-deckdelete)
+   - [POST /flashcards/create/](#post-flashcardscreate)
+   - [POST /flashcards/delete/](#post-flashcardsdelete)
+   - [PUT /flashcards/edit/](#put-flashcardsedit)
 
 ## Introduction
 
@@ -25,7 +25,7 @@ Most API calls require authentication via a CSRF token and a JWT. Use the `/csrf
 
 ---
 
-### GET /csrf_cookie
+### GET /csrf_cookie/
 
 #### Description:
 
@@ -53,7 +53,7 @@ Obtain a CSRF token for authentication.
 
 ---
 
-### POST /auth/signup
+### POST /auth/signup/
 
 #### Description:
 
@@ -94,7 +94,7 @@ Register a new user.
 
 ---
 
-### POST /auth/login
+### POST /auth/login/
 
 #### Description:
 
@@ -133,7 +133,7 @@ Login an existing user.
 
 ---
 
-### POST /auth/logout
+### POST /auth/logout/
 
 #### Description:
 
@@ -161,7 +161,7 @@ Logout the current user.
 
 ---
 
-### POST /deck/create
+### POST /deck/create/
 
 #### Description:
 
@@ -199,7 +199,7 @@ Create a new deck of flashcards from a given block of text.
 
 ---
 
-### POST /deck/delete
+### POST /deck/delete/
 
 #### Description:
 
@@ -246,7 +246,7 @@ Delete a specific deck of flashcards.
 
 ---
 
-### POST /flashcards/create
+### POST /flashcards/create/
 
 #### Description:
 
@@ -286,7 +286,7 @@ Create a new flashcard in a specific deck.
 
 ---
 
-### POST /flashcards/delete
+### POST /flashcards/delete/
 
 #### Description:
 
@@ -333,15 +333,15 @@ Delete a specific flashcard.
 
 ---
 
-### POST /flashcards/edit
+### PUT /flashcards/edit
 
 #### Description:
 
-Edit a specific flashcard.
+Edit a specific flashcard. You can update either `term`, `definition`, or both.
 
 #### Method:
 
-`POST`
+`PUT`
 
 #### Headers:
 
@@ -354,10 +354,12 @@ Edit a specific flashcard.
 ```json
 {
   "flashcard_id": "integer",
-  "term": "string",
-  "definition": "string"
+  "term": "string (optional)",
+  "definition": "string (optional)"
 }
 ```
+
+- `term` and `definition` are optional fields. At least one must be provided for the update to occur.
 
 #### Response:
 
