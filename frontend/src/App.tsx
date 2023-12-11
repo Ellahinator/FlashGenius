@@ -38,7 +38,7 @@ const AppContent = () => {
     setToken("");
     removeCookie("jwt_token");
     removeCookie("refresh_token");
-    navigate("/login");
+    navigate("/");
   };
 
   const login = (access_token: string, refresh_token: string) => {

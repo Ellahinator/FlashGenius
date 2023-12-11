@@ -152,7 +152,7 @@ export default function SignupCard({ login }: LoginCardProps) {
               </Button>
             </Stack>
             <Stack>
-              <Text align={"center"}>
+              <Text align={"center"} fontSize={"md"}>
                 Already a user?{" "}
                 <ChakraLink
                   as={ReactRouterLink}

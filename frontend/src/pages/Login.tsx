@@ -149,9 +149,21 @@ export default function LoginCard({ login }: LoginCardProps) {
                   bg: "blue.500",
                 }}
                 onClick={handleSubmit}
+                mb={"0"}
               >
                 Login
               </Button>
+              <Text align={"center"} fontSize={"md"}>
+                Don't have an account?{" "}
+                <Text
+                  as={ReactRouterLink}
+                  to="/signup"
+                  color={"blue.400"}
+                  fontSize={"sm"}
+                >
+                  Sign Up
+                </Text>
+              </Text>
             </Stack>
           </Stack>
         </Box>
