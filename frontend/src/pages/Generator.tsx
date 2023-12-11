@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../axiosInstance";
 import { getCookie } from "typescript-cookie";
 import {
   Button,
   Container,
+  Flex,
   Text,
   Textarea,
   useColorModeValue,
@@ -16,6 +17,13 @@ export default function FlashcardGenerator() {
   const [text, setText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    const jwt_token = getCookie("jwt_token");
+    if (!jwt_token) {
+      navigate("/login");
+    }
+  }, [navigate]);
 
   const generateFlashcards = async () => {
     setIsLoading(true);
@@ -35,45 +43,51 @@ export default function FlashcardGenerator() {
   };
 
   return (
-    <Container
-      maxW="lg"
-      p={4}
-      rounded="lg"
-      bg={bgColor}
-      boxShadow="lg"
-      mt={"20px"}
+    <Flex
+      direction="column"
+      align="center"
+      minH="100vh" // Sets the minimum height to full viewport height
     >
-      <Text fontSize="xl" fontWeight="bold" mb={4}>
-        Flashcard Generator
-      </Text>
-      <Textarea
-        value={text}
-        onChange={(e) => {
-          setText(e.target.value);
-        }}
-        placeholder="Enter your text here..."
-        size="sm"
-        mb={4}
-        height={"md"}
-      />
-      <Button
-        bg={"orange.500"}
-        color={"white"}
-        _hover={{
-          bg: "blue.500",
-        }}
-        isLoading={isLoading}
-        loadingText="Generating Flashcards..."
-        onClick={generateFlashcards}
-        mb={4}
+      <Container
+        maxW="lg"
+        p={4}
+        rounded="lg"
+        bg={bgColor}
+        boxShadow="lg"
+        mt={"20px"}
       >
-        Generate Flashcards
-      </Button>
-      {errorMessage && (
-        <Text color="red.500" mt={4}>
-          {errorMessage}
+        <Text fontSize="xl" fontWeight="bold" mb={4}>
+          Flashcard Generator
         </Text>
-      )}
-    </Container>
+        <Textarea
+          value={text}
+          onChange={(e) => {
+            setText(e.target.value);
+          }}
+          placeholder="Enter your text here..."
+          size="sm"
+          mb={4}
+          height={"md"}
+        />
+        <Button
+          bg={"orange.500"}
+          color={"white"}
+          _hover={{
+            bg: "blue.500",
+          }}
+          isLoading={isLoading}
+          loadingText="Generating Flashcards..."
+          onClick={generateFlashcards}
+          mb={4}
+        >
+          Generate Flashcards
+        </Button>
+        {errorMessage && (
+          <Text color="red.500" mt={4}>
+            {errorMessage}
+          </Text>
+        )}
+      </Container>
+    </Flex>
   );
 }

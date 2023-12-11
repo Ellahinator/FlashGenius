@@ -863,20 +863,19 @@ export default function Home() {
             Experience the future of efficient learning today.
           </Text>
           <Stack spacing={6} direction={"row"}>
-            <Link to="/signup">
+            <Link to="/generate">
               <Button
                 rounded={"full"}
                 px={6}
-                colorScheme={"orange"}
-                bg={"orange.400"}
-                _hover={{ bg: "orange.500" }}
+                bgGradient="linear(to-r, orange.400, red.500)"
+                color="white"
+                _hover={{
+                  bgGradient: "linear(to-r, orange.500, red.600)",
+                }}
               >
-                Get started
+                Generate Flashcards
               </Button>
             </Link>
-            <Button rounded={"full"} px={6}>
-              Learn more
-            </Button>
           </Stack>
           <Flex w={"full"}>
             <Illustration
