@@ -64,12 +64,17 @@ class AuthView(APIView):
         if form.is_valid():
             # Save the user created by the form
             user = form.save()
-            # Create a JWT access token for the new user 
-            access_token = create_jwt_with_user_info(user)
+            # Create a JWT access token and refresh token for the new user 
+            access_token, refresh_token = create_jwt_with_user_info(user)
             # Log in the user after successful registration 
             login(request, user)
             # Return a success response with the access token and a welcome message
-            return Response({"status": "success", "access_token": access_token, "message": "Registration successful."}, status=status.HTTP_201_CREATED)
+            return Response({
+                "status": "success",
+                "access_token": access_token,
+                "refresh_token": refresh_token, 
+                "message": "Registration successful."
+            }, status=status.HTTP_201_CREATED)
         else:
             # Return an error response with form validation errors
             return Response({"status": "error", "errors": form.errors}, status=status.HTTP_400_BAD_REQUEST)
@@ -84,10 +89,15 @@ class AuthView(APIView):
 
         # Check if authentication is successful
         if user is not None:
-             # If successful, create a JWT access token for the user
-            access_token = create_jwt_with_user_info(user)
+             # If successful, create a JWT access token and refresh token for the user
+            access_token, refresh_token = create_jwt_with_user_info(user)
             # Return a success response with the access token and a welcome message
-            return Response({"status": "success", "access_token": access_token, "message": f"You are now logged in as {user}."}, status=status.HTTP_200_OK)
+            return Response({
+                "status": "success",
+                "access_token": access_token,
+                "refresh_token": refresh_token, 
+                "message": f"You are now logged in as {user}."
+            }, status=status.HTTP_200_OK)
         else:
             # If authentication fails, check whether the username or password is incorrect
             if username_exists(username):
@@ -398,8 +408,9 @@ def parse_request_body(request):
     
 def create_jwt_with_user_info(user):
     refresh = RefreshToken.for_user(user)
-
     refresh['user_id'] = user.id
 
-    return str(refresh.access_token)
+    access_token = str(refresh.access_token)
+    refresh_token = str(refresh)  
 
+    return access_token, refresh_token

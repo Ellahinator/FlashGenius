@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Flashcard from "../components/Flashcard";
 import { DeckFlashcard } from "../types";
-import axios from "axios";
+import axios from "../axiosInstance";
 import { useParams } from "react-router-dom";
 import { getCookie } from "typescript-cookie";
 import {
@@ -25,16 +25,13 @@ import {
   useDisclosure,
   Card,
   Textarea,
-  useClipboard
+  useClipboard,
 } from "@chakra-ui/react";
-import { DeleteIcon,EditIcon } from "@chakra-ui/icons";
-
-
-
+import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 
 export default function FlashcardsDisplay() {
-  const editModal = useDisclosure(); 
-  const exportModal = useDisclosure(); 
+  const editModal = useDisclosure();
+  const exportModal = useDisclosure();
   const navigate = useNavigate();
   const { deckId } = useParams();
   const [flashcards, setFlashcards] = useState<DeckFlashcard[]>([]);
@@ -49,20 +46,26 @@ export default function FlashcardsDisplay() {
   const [exportData, setExportData] = useState("");
   const { hasCopied, onCopy } = useClipboard(exportData);
 
-  const handleModalOpen = (term:string, definition:string, flashcard_id:number) => {
-    editModal.onOpen(); 
+  const handleModalOpen = (
+    term: string,
+    definition: string,
+    flashcard_id: number
+  ) => {
+    editModal.onOpen();
     setEditTerm(term);
     setEditDef(definition);
     setEditId(flashcard_id);
-  }
+  };
   const generateExportData = () => {
-    let formattedData = flashcards.map(flashcard => `${flashcard.term},${flashcard.definition}`).join(';');
+    let formattedData = flashcards
+      .map((flashcard) => `${flashcard.term},${flashcard.definition}`)
+      .join(";");
     setExportData(formattedData);
   };
 
   const handleExport = () => {
     generateExportData();
-    exportModal.onOpen(); 
+    exportModal.onOpen();
   };
 
   const bgColor = useColorModeValue("gray.50", "gray.700");
@@ -82,7 +85,7 @@ export default function FlashcardsDisplay() {
   const saveNewDeckName = async () => {
     try {
       await axios.post(
-        `http://127.0.0.1:8000/deck/update/`,
+        `deck/update/`,
         {
           deck_id: deckId,
           deck_name: newDeckName,
@@ -101,86 +104,73 @@ export default function FlashcardsDisplay() {
   };
 
   useEffect(() => {
-    
     fetchFlashcards();
   }, [deckId]);
 
   const fetchFlashcards = async () => {
     try {
-      const response = await axios.post(
-        `http://127.0.0.1:8000/deck/get/`,
-        { deck_id: deckId },
-        config
-      );
-      console.log("flashcards",response.data.flashcards)
+      const response = await axios.post(`deck/get/`, { deck_id: deckId });
+      console.log("flashcards", response.data.flashcards);
       setFlashcards(response.data.flashcards);
     } catch (error) {
       console.error("Error fetching flashcards:", error);
     }
   };
 
-  const handleDelete =async (flashcardId: number) => {
+  const handleDelete = async (flashcardId: number) => {
     try {
-      const jwt_token = getCookie("jwt_token")
-      const csrftoken = getCookie("csrftoken");
-      const config = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": csrftoken,
-          'Authorization': `Bearer ${jwt_token}`,
-        },
-        withCredentials: true,
-      };
-      await axios.post('http://127.0.0.1:8000/flashcards/delete/', { flashcard_id: flashcardId }, config);
-      fetchFlashcards()
+      await axios.post("flashcards/delete/", { flashcard_id: flashcardId });
+      fetchFlashcards();
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-    
-  }
-  const handleEdit =async (flashcardId: number) => {
+  };
+  const handleEdit = async (flashcardId: number) => {
     try {
-      const jwt_token = getCookie("jwt_token")
-      const csrftoken = getCookie("csrftoken");
-      const config = {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": csrftoken,
-          'Authorization': `Bearer ${jwt_token}`,
-        },
-        withCredentials: true,
-      };
-      await axios.put('http://127.0.0.1:8000/flashcards/edit/', { flashcard_id: flashcardId,term:editTerm,definition:editDef }, config);
-
-      editModal.onClose()
-      fetchFlashcards()
+      await axios.put("flashcards/edit/", {
+        flashcard_id: flashcardId,
+        term: editTerm,
+        definition: editDef,
+      });
+      editModal.onClose();
+      fetchFlashcards();
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-    
-  }
+  };
 
   const renderFlashcardList = () => {
     return flashcards.map((flashcard, index) => (
       <Flex key={index} justify="center" align="center">
-      <Box
-        p={4}
-        borderWidth="1px"
-        borderRadius="lg"
-        overflow="hidden"
-        mb={2}
-        boxShadow="sm"
-        bg={bgColor}
-      >
-        <SimpleGrid columns={2} spacing={10}>
-          <Box fontWeight="bold">{flashcard.term}</Box>
-          <Box>{flashcard.definition}</Box>
-        </SimpleGrid>
-      </Box>
-      <DeleteIcon ml = "15px" color="red" onClick={()=>handleDelete(flashcard.flashcard_id)}/>
-      <EditIcon ml ="15px" onClick={()=> handleModalOpen(flashcard.term,flashcard.definition,flashcard.flashcard_id)}/>
+        <Box
+          p={4}
+          borderWidth="1px"
+          borderRadius="lg"
+          overflow="hidden"
+          mb={2}
+          boxShadow="sm"
+          bg={bgColor}
+        >
+          <SimpleGrid columns={2} spacing={10}>
+            <Box fontWeight="bold">{flashcard.term}</Box>
+            <Box>{flashcard.definition}</Box>
+          </SimpleGrid>
+        </Box>
+        <DeleteIcon
+          ml="15px"
+          color="red"
+          onClick={() => handleDelete(flashcard.flashcard_id)}
+        />
+        <EditIcon
+          ml="15px"
+          onClick={() =>
+            handleModalOpen(
+              flashcard.term,
+              flashcard.definition,
+              flashcard.flashcard_id
+            )
+          }
+        />
       </Flex>
     ));
   };
@@ -201,98 +191,113 @@ export default function FlashcardsDisplay() {
 
   return (
     <>
-    <Modal onClose={editModal.onClose} size={"lg"} isOpen={editModal.isOpen}>
+      <Modal onClose={editModal.onClose} size={"lg"} isOpen={editModal.isOpen}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Edit Flashcard</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-          <Input value={editTerm} onChange={(e)=> setEditTerm(e.target.value)}/>
-          <Textarea  value={editDef} onChange={(e)=> setEditDef(e.target.value)}/>
+            <Input
+              value={editTerm}
+              onChange={(e) => setEditTerm(e.target.value)}
+            />
+            <Textarea
+              value={editDef}
+              onChange={(e) => setEditDef(e.target.value)}
+            />
           </ModalBody>
           <ModalFooter>
             <Button onClick={editModal.onClose}>Close</Button>
-            <Button onClick ={()=> handleEdit(editId)}>Save</Button>
+            <Button onClick={() => handleEdit(editId)}>Save</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
-    <VStack spacing={4} align="center" marginBottom={20}>
-      <Button onClick={() => navigate("/generate")}>
-        Back to Flashcard Generator
-      </Button>
-      <Flashcard
-        front={flashcards[currentIndex]?.term}
-        back={flashcards[currentIndex]?.definition}
-        showBack={showBack}
-        toggleCard={() => setShowBack(!showBack)}
-      />
-      <VStack spacing={2}>
-        <Button onClick={prevFlashcard} isDisabled={currentIndex === 0}>
-          ←
+      <VStack spacing={4} align="center" marginBottom={20}>
+        <Button onClick={() => navigate("/generate")}>
+          Back to Flashcard Generator
         </Button>
-        <Text>
-          {currentIndex + 1}/{flashcards.length}
-        </Text>
-        <Button
-          onClick={nextFlashcard}
-          isDisabled={currentIndex === flashcards.length - 1}
-        >
-          →
-        </Button>
-        <VStack width="100%" align="start"></VStack>
-      </VStack>
-      <VStack spacing={4} align="center">
-        <List spacing={2} w="50%" pt={5}>
-          {renderFlashcardList()}
-        </List>
-      </VStack>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          saveNewDeckName();
-        }}
-      >
-        <VStack>
-          <Input
-            placeholder="Enter deck name"
-            value={newDeckName}
-            onChange={(e) => {
-              setNewDeckName(e.target.value);
-            }}
-            textAlign={"center"}
-          />
+        <Flashcard
+          front={flashcards[currentIndex]?.term}
+          back={flashcards[currentIndex]?.definition}
+          showBack={showBack}
+          toggleCard={() => setShowBack(!showBack)}
+        />
+        <VStack spacing={2}>
+          <Button onClick={prevFlashcard} isDisabled={currentIndex === 0}>
+            ←
+          </Button>
+          <Text>
+            {currentIndex + 1}/{flashcards.length}
+          </Text>
           <Button
-            type="submit"
-            bg={"orange.500"}
-            color={"white"}
-            _hover={{
-              bg: "blue.500",
-            }}
+            onClick={nextFlashcard}
+            isDisabled={currentIndex === flashcards.length - 1}
           >
-            Save Deck
+            →
           </Button>
-          <Button onClick={handleExport}>Export</Button>
-
-      <Modal isOpen={exportModal.isOpen} onClose={exportModal.onClose} size={"lg"}>
-      <ModalOverlay />
-      <ModalContent >
-        <ModalHeader>Export to Quizlet</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <Textarea height={"lg"} value={exportData} isReadOnly />
-        </ModalBody>
-        <ModalFooter>
-          <Button onClick={onCopy} bg={"orange.500"} color={"white"} _hover={{ bg: "blue.500" }}>
-            {hasCopied ? "Copied!" : "Copy"}
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+          <VStack width="100%" align="start"></VStack>
         </VStack>
-      </form>
-      {successMessage && <Text color="green.500">{successMessage}</Text>}
-      {errorMessage && <Text color="red.500">{errorMessage}</Text>}
-    </VStack>
+        <VStack spacing={4} align="center">
+          <List spacing={2} w="50%" pt={5}>
+            {renderFlashcardList()}
+          </List>
+        </VStack>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            saveNewDeckName();
+          }}
+        >
+          <VStack>
+            <Input
+              placeholder="Enter deck name"
+              value={newDeckName}
+              onChange={(e) => {
+                setNewDeckName(e.target.value);
+              }}
+              textAlign={"center"}
+            />
+            <Button
+              type="submit"
+              bg={"orange.500"}
+              color={"white"}
+              _hover={{
+                bg: "blue.500",
+              }}
+            >
+              Save Deck
+            </Button>
+            <Button onClick={handleExport}>Export</Button>
+
+            <Modal
+              isOpen={exportModal.isOpen}
+              onClose={exportModal.onClose}
+              size={"lg"}
+            >
+              <ModalOverlay />
+              <ModalContent>
+                <ModalHeader>Export to Quizlet</ModalHeader>
+                <ModalCloseButton />
+                <ModalBody>
+                  <Textarea height={"lg"} value={exportData} isReadOnly />
+                </ModalBody>
+                <ModalFooter>
+                  <Button
+                    onClick={onCopy}
+                    bg={"orange.500"}
+                    color={"white"}
+                    _hover={{ bg: "blue.500" }}
+                  >
+                    {hasCopied ? "Copied!" : "Copy"}
+                  </Button>
+                </ModalFooter>
+              </ModalContent>
+            </Modal>
+          </VStack>
+        </form>
+        {successMessage && <Text color="green.500">{successMessage}</Text>}
+        {errorMessage && <Text color="red.500">{errorMessage}</Text>}
+      </VStack>
     </>
   );
 }

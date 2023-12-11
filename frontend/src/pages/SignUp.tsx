@@ -20,10 +20,10 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
-import axios from "axios";
-import { getCookie } from "typescript-cookie";
+import axios from "../axiosInstance";
+import { LoginCardProps } from "../types";
 
-export default function SignupCard() {
+export default function SignupCard({ login }: LoginCardProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
@@ -36,42 +36,32 @@ export default function SignupCard() {
   const navigate = useNavigate();
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
     setIsLoading(true);
     setErrorMessage("");
-    e.preventDefault();
-    let csrftoken = await getCookie("csrftoken");
-    try {
-      const config = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": csrftoken,
-        },
-        withCredentials: true,
-      };
 
-      const response = await axios.post(
-        "http://127.0.0.1:8000/auth/signup/",
-        formData,
-        config
-      );
-      if ((response.data as any).status === "success") {
+    try {
+      const response = await axios.post("auth/signup/", formData);
+      if (response.data.status === "success") {
         console.log("Registration successful.");
+        login(response.data.access_token, response.data.refresh_token);
         navigate("/");
       } else {
-        console.log("An error occurred:", response.data.message);
-        setErrorMessage(response.data.message || "An error occurred.");
+        setErrorMessage(
+          response.data.message || "An error occurred during signup."
+        );
       }
-      setIsLoading(false);
-    } catch (error: unknown) {
-      // Handle error
-      if (error instanceof Error) {
-        console.error("There was an error sending the data", error);
+    } catch (error) {
+      if ((error as any)?.response) {
+        setErrorMessage(
+          (error as any).response.data.message || "An error occurred."
+        );
+      } else if (error instanceof Error) {
         setErrorMessage(error.message || "An error occurred.");
       } else {
-        console.error("An unknown error occurred", error);
         setErrorMessage("An unknown error occurred.");
       }
+    } finally {
       setIsLoading(false);
     }
   };

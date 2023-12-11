@@ -1,5 +1,5 @@
 import { useState, useEffect, SetStateAction } from "react";
-import axios from "axios";
+import axios from "../axiosInstance";
 import { useNavigate } from "react-router-dom";
 import { EditIcon, ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { getCookie } from "typescript-cookie";
@@ -40,30 +40,13 @@ const Account = () => {
     const fetchUserData = async () => {
       setIsLoading(true);
       try {
-        const jwt_token = getCookie("jwt_token");
-        let userInfoResponse = await axios.get(
-          "http://127.0.0.1:8000/user-info/",
-          {
-            headers: { Authorization: `Bearer ${jwt_token}` },
-          }
-        );
+        let userInfoResponse = await axios.get("user-info/");
         setEmail(userInfoResponse.data.email);
 
-        let decksResponse = await axios.get("http://127.0.0.1:8000/decks/", {
-          headers: { Authorization: `Bearer ${jwt_token}` },
-        });
+        let decksResponse = await axios.get("decks/");
         setDecks(decksResponse.data.decks);
-      } catch (error: any) {
-        if (error.response && error.response.status === 401) {
-          toast({
-            title: "Unauthorized",
-            description: "Please login to continue.",
-            status: "error",
-            duration: 9000,
-            isClosable: true,
-          });
-          navigate("/login"); // Redirect to login page
-        } else {
+      } catch (error) {
+        if (!(error as any).config._isRetry) {
           toast({
             title: "Error",
             description: "An error occurred while fetching data.",
@@ -78,7 +61,7 @@ const Account = () => {
     };
 
     fetchUserData();
-  }, [toast, navigate]);
+  }, [toast]);
 
   const handlePasswordChange = (event: {
     target: { value: SetStateAction<string> };
@@ -90,7 +73,7 @@ const Account = () => {
     target: { value: SetStateAction<string> };
   }) => {
     setConfirmPassword(event.target.value);
-  }
+  };
 
   const handlePasswordVisibility = () => setShowPassword(!showPassword);
   const handleSubmit = async () => {

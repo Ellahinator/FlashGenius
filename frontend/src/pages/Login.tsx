@@ -13,20 +13,17 @@ import {
   Text,
   useColorModeValue,
   InputGroup,
-  InputRightElement
+  InputRightElement,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { Link as ReactRouterLink, useNavigate } from "react-router-dom";
-import { getCookie, setCookie } from "typescript-cookie";
-import axios from "axios";
+import { getCookie } from "typescript-cookie";
+import { AxiosError } from "axios";
+import axios from "../axiosInstance";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+import { LoginCardProps } from "../types";
 
-interface LoginCardProps{
-  login:(value:string)=> void;
-}
-
-
-export default function LoginCard({login}:LoginCardProps) {
+export default function LoginCard({ login }: LoginCardProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
@@ -40,33 +37,21 @@ export default function LoginCard({login}:LoginCardProps) {
     setIsLoading(true);
     setErrorMessage("");
     e.preventDefault();
-    let csrftoken = await getCookie("csrftoken");
     try {
-      const config = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": csrftoken,
-        },
-        withCredentials: true,
-      };
+      const response = await axios.post("/auth/login/", formData);
 
-      const response = await axios.post(
-        "http://127.0.0.1:8000/auth/login/",
-        formData,
-        config
-      );
       if (response.data.status === "success") {
-        let jwt_token= response.data.access_token
-        login(jwt_token)
-        const protectedRouteResponse = await axios.get("http://127.0.0.1:8000/protected/", {
+        let access_token = response.data.access_token;
+        let refresh_token = response.data.refresh_token;
+        login(access_token, refresh_token);
+        const protectedRouteResponse = await axios.get("/protected/", {
           headers: {
-            "Authorization": `Bearer ${jwt_token}`,
+            Authorization: `Bearer ${access_token}`,
           },
         });
 
         if (protectedRouteResponse.data.message === "You are authenticated.") {
-          console.log("Authenticated")
+          console.log("Authenticated");
           navigate("/generate");
         } else {
           console.error("Error accessing protected route");
@@ -76,10 +61,11 @@ export default function LoginCard({login}:LoginCardProps) {
       }
 
       setIsLoading(false);
-    } catch (error: any) {
-      if (error.response){
-        let errorType= error.response.data.message
-        setErrorMessage(errorType);
+    } catch (error) {
+      if ((error as AxiosError).response) {
+        let errorType = (error as AxiosError<{ message: string }>).response
+          ?.data?.message;
+        setErrorMessage(errorType || "");
       }
       // Handle error
       else if (error instanceof Error) {
@@ -116,7 +102,7 @@ export default function LoginCard({login}:LoginCardProps) {
           p={8}
         >
           <Stack spacing={4}>
-            <FormControl id="username" isRequired >
+            <FormControl id="username" isRequired>
               <FormLabel>Username</FormLabel>
               <Input type="text" name="username" onChange={handleChange} />
             </FormControl>
@@ -139,10 +125,10 @@ export default function LoginCard({login}:LoginCardProps) {
               </InputGroup>
             </FormControl>
             {errorMessage && (
-              <Text color={"red.500"} fontSize={"sm"} align={"start"} >
-              {errorMessage}
+              <Text color={"red.500"} fontSize={"sm"} align={"start"}>
+                {errorMessage}
               </Text>
-          )}
+            )}
             <Stack spacing={10}>
               <Stack
                 direction={{ base: "column", sm: "row" }}

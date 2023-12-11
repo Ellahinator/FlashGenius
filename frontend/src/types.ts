@@ -9,3 +9,7 @@ export interface Deck {
   deck_name: string;
   term_count: number;
 }
+
+export interface LoginCardProps {
+  login: (access_token: string, refresh_token: string) => void;
+}
