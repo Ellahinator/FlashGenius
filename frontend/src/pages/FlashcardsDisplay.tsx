@@ -33,7 +33,8 @@ import { DeleteIcon,EditIcon } from "@chakra-ui/icons";
 
 
 export default function FlashcardsDisplay() {
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const editModal = useDisclosure(); 
+  const exportModal = useDisclosure(); 
   const navigate = useNavigate();
   const { deckId } = useParams();
   const [flashcards, setFlashcards] = useState<DeckFlashcard[]>([]);
@@ -48,6 +49,12 @@ export default function FlashcardsDisplay() {
   const [exportData, setExportData] = useState("");
   const { hasCopied, onCopy } = useClipboard(exportData);
 
+  const handleModalOpen = (term:string, definition:string, flashcard_id:number) => {
+    editModal.onOpen(); 
+    setEditTerm(term);
+    setEditDef(definition);
+    setEditId(flashcard_id);
+  }
   const generateExportData = () => {
     let formattedData = flashcards.map(flashcard => `${flashcard.term},${flashcard.definition}`).join(';');
     setExportData(formattedData);
@@ -55,7 +62,7 @@ export default function FlashcardsDisplay() {
 
   const handleExport = () => {
     generateExportData();
-    onOpen();
+    exportModal.onOpen(); 
   };
 
   const bgColor = useColorModeValue("gray.50", "gray.700");
@@ -147,7 +154,7 @@ export default function FlashcardsDisplay() {
       };
       await axios.put('http://127.0.0.1:8000/flashcards/edit/', { flashcard_id: flashcardId,term:editTerm,definition:editDef }, config);
 
-      onClose()
+      editModal.onClose()
       fetchFlashcards()
     } catch (error) {
       console.error(error)
@@ -191,15 +198,10 @@ export default function FlashcardsDisplay() {
       setShowBack(false);
     }
   };
-  const handleModalOpen = (term:string,definition:string,flashcard_id:number) => {
-    onOpen()
-    setEditTerm(term)
-    setEditDef(definition)
-    setEditId(flashcard_id)
-  }
+
   return (
     <>
-    <Modal onClose={onClose} size={"lg"} isOpen={isOpen}>
+    <Modal onClose={editModal.onClose} size={"lg"} isOpen={editModal.isOpen}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Edit Flashcard</ModalHeader>
@@ -209,7 +211,7 @@ export default function FlashcardsDisplay() {
           <Textarea  value={editDef} onChange={(e)=> setEditDef(e.target.value)}/>
           </ModalBody>
           <ModalFooter>
-            <Button onClick={onClose}>Close</Button>
+            <Button onClick={editModal.onClose}>Close</Button>
             <Button onClick ={()=> handleEdit(editId)}>Save</Button>
           </ModalFooter>
         </ModalContent>
@@ -271,7 +273,7 @@ export default function FlashcardsDisplay() {
           </Button>
           <Button onClick={handleExport}>Export</Button>
 
-    <Modal isOpen={isOpen} onClose={onClose} size={"lg"}>
+      <Modal isOpen={exportModal.isOpen} onClose={exportModal.onClose} size={"lg"}>
       <ModalOverlay />
       <ModalContent >
         <ModalHeader>Export to Quizlet</ModalHeader>
