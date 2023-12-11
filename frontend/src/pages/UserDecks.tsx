@@ -32,7 +32,7 @@ export default function UserDecks() {
   };
 
   return (
-    <VStack margin={8}>
+    <VStack margin={8} minH="100vh">
       {decks.map((deck) => (
         <Flex w="100%" justify="center" align="center" key={deck.deck_id}>
           <Link to={`/deck/${deck.deck_id}`} style={{ width: "70%" }}>
