@@ -15,12 +15,26 @@ import {
   Box,
   SimpleGrid,
   Flex,
-  Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, useDisclosure, Textarea, useClipboard
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+  Card,
+  Textarea,
+  useClipboard
 } from "@chakra-ui/react";
-import { DeleteIcon } from "@chakra-ui/icons";
-import {  } from "@chakra-ui/react";
+import { DeleteIcon,EditIcon } from "@chakra-ui/icons";
+
+
+
 
 export default function FlashcardsDisplay() {
+  const editModal = useDisclosure(); 
+  const exportModal = useDisclosure(); 
   const navigate = useNavigate();
   const { deckId } = useParams();
   const [flashcards, setFlashcards] = useState<DeckFlashcard[]>([]);
@@ -29,10 +43,18 @@ export default function FlashcardsDisplay() {
   const [showBack, setShowBack] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [editTerm, setEditTerm] = useState("");
+  const [editDef, setEditDef] = useState("");
+  const [editId, setEditId] = useState(0);
   const [exportData, setExportData] = useState("");
   const { hasCopied, onCopy } = useClipboard(exportData);
 
+  const handleModalOpen = (term:string, definition:string, flashcard_id:number) => {
+    editModal.onOpen(); 
+    setEditTerm(term);
+    setEditDef(definition);
+    setEditId(flashcard_id);
+  }
   const generateExportData = () => {
     let formattedData = flashcards.map(flashcard => `${flashcard.term},${flashcard.definition}`).join(';');
     setExportData(formattedData);
@@ -40,7 +62,7 @@ export default function FlashcardsDisplay() {
 
   const handleExport = () => {
     generateExportData();
-    onOpen();
+    exportModal.onOpen(); 
   };
 
   const bgColor = useColorModeValue("gray.50", "gray.700");
@@ -117,6 +139,28 @@ export default function FlashcardsDisplay() {
     }
     
   }
+  const handleEdit =async (flashcardId: number) => {
+    try {
+      const jwt_token = getCookie("jwt_token")
+      const csrftoken = getCookie("csrftoken");
+      const config = {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrftoken,
+          'Authorization': `Bearer ${jwt_token}`,
+        },
+        withCredentials: true,
+      };
+      await axios.put('http://127.0.0.1:8000/flashcards/edit/', { flashcard_id: flashcardId,term:editTerm,definition:editDef }, config);
+
+      editModal.onClose()
+      fetchFlashcards()
+    } catch (error) {
+      console.error(error)
+    }
+    
+  }
 
   const renderFlashcardList = () => {
     return flashcards.map((flashcard, index) => (
@@ -136,6 +180,7 @@ export default function FlashcardsDisplay() {
         </SimpleGrid>
       </Box>
       <DeleteIcon ml = "15px" color="red" onClick={()=>handleDelete(flashcard.flashcard_id)}/>
+      <EditIcon ml ="15px" onClick={()=> handleModalOpen(flashcard.term,flashcard.definition,flashcard.flashcard_id)}/>
       </Flex>
     ));
   };
@@ -155,6 +200,22 @@ export default function FlashcardsDisplay() {
   };
 
   return (
+    <>
+    <Modal onClose={editModal.onClose} size={"lg"} isOpen={editModal.isOpen}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Edit Flashcard</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+          <Input value={editTerm} onChange={(e)=> setEditTerm(e.target.value)}/>
+          <Textarea  value={editDef} onChange={(e)=> setEditDef(e.target.value)}/>
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={editModal.onClose}>Close</Button>
+            <Button onClick ={()=> handleEdit(editId)}>Save</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     <VStack spacing={4} align="center" marginBottom={20}>
       <Button onClick={() => navigate("/generate")}>
         Back to Flashcard Generator
@@ -211,8 +272,8 @@ export default function FlashcardsDisplay() {
             Save Deck
           </Button>
           <Button onClick={handleExport}>Export</Button>
-    
-    <Modal isOpen={isOpen} onClose={onClose} size={"lg"}>
+
+      <Modal isOpen={exportModal.isOpen} onClose={exportModal.onClose} size={"lg"}>
       <ModalOverlay />
       <ModalContent >
         <ModalHeader>Export to Quizlet</ModalHeader>
@@ -232,5 +293,6 @@ export default function FlashcardsDisplay() {
       {successMessage && <Text color="green.500">{successMessage}</Text>}
       {errorMessage && <Text color="red.500">{errorMessage}</Text>}
     </VStack>
+    </>
   );
 }
